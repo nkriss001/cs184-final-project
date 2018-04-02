@@ -40,7 +40,7 @@
   <h2 align="middle">Goals and Deliverables</h2>
   <p>As a baseline, we will implement the Ball Pivoting Algorithm, specifically sections IV-A through D in the research paper. That is, we will be able to create a triangle mesh from an appropriately dense and evenly sampled point cloud. We will test this algorithm on models from the Stanford 3D repository with different ball radii and different mesh cloud sizes, and qualitatively compare the results of the algorithm with the actual triangle meshes produced by our basic Project 2 code. We will also quantitatively compare the results by seeing what percentage of the edges in our BPA-generated meshes also appear in the actual triangle meshes. With this analysis, we plan to answer how effective and accurate BPA is for different input parameters.
   <br><br>
-  Once we can successfully convert a point cloud into a triangle mesh, we hope to improve our model and potentially implement a more complex model to compare and contrast with the original. Our first expansion will be adaptive mesh detail, as described in part IV-F of the paper. By running BPA with varied ball radii, we can create a mesh with more or less detail as required by the area in question. If a portion of the point cloud is especially flat, we can reduce it to fewer triangles. If we have additional time, we will implement part IV-E of the paper, which divides the point cloud into arbitrary portions which can be cached to save memory and speed up runtime. If all of this goes especially smoothly and we are left with significantly more time than expected, we will implement Poisson Surface Reconstruction, a more complex but more accurate model for mesh creation. This will allow us to compare the two methods and better understand the mesh creation process as a whole.
+  Once we can successfully convert a point cloud into a triangle mesh, we hope to improve our model and potentially implement a more complex model to compare and contrast with the original. Our first expansion will be adaptive mesh detail, as described in part IV-F of the paper. By running BPA with varied ball radii, we can create a mesh with more or less detail as required by the area in question. If a portion of the point cloud is especially flat, we can reduce it to fewer triangles. If we have additional time, we will implement part IV-E of the paper, which divides the point cloud into arbitrary portions which can be cached to save memory and speed up runtime. If all of this goes especially smoothly and we are left with significantly more time than expected, we will implement <a href="http://hhoppe.com/poissonrecon.pdf">Poisson Surface Reconstruction</a>, a more complex but more accurate model for mesh creation. This will allow us to compare the two methods and better understand the mesh creation process as a whole.
   </p>
   
   <h2 align="middle">Schedule</h2>
@@ -55,9 +55,9 @@
   <ul>
     <li>Hive computers</li>
     <li>HP Envy laptop with a GTX 850</li>
-    <li>The Ball-Pivoting Algorithm for Surface Reconstruction: http://www.research.ibm.com/vistechnology/pdf/bpa_tvcg.pdf</li>
-    <li>Poisson Surface Reconstruction: http://research.microsoft.com/en-us/um/people/hoppe/poissonrecon.pdf</li>
-    <li>The Stanford 3D Scanning Repository: http://graphics.stanford.edu/data/3Dscanrep/</li>
+    <li>The Ball-Pivoting Algorithm for Surface Reconstruction: <a href="http://www.research.ibm.com/vistechnology/pdf/bpa_tvcg.pdf">http://www.research.ibm.com/vistechnology/pdf/bpa_tvcg.pdf</a></li>
+    <li>Poisson Surface Reconstruction: <a href="http://hhoppe.com/poissonrecon.pdf">http://research.microsoft.com/en-us/um/people/hoppe/poissonrecon.pdf</a></li>
+    <li>The Stanford 3D Scanning Repository: <a href="http://graphics.stanford.edu/data/3Dscanrep/">http://graphics.stanford.edu/data/3Dscanrep/</a></li>
   </ul>
   <p>We will also use some of the starter code for Project 2 to help produce images of the final meshes.</p>
  
