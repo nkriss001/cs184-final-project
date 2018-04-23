@@ -289,8 +289,8 @@ src/preinstall:
 # Target rules for target src/CMakeFiles/meshedit.dir
 
 # All Build rule for target.
-src/CMakeFiles/meshedit.dir/all: CGL/src/CMakeFiles/CGL.dir/all
 src/CMakeFiles/meshedit.dir/all: CGL/deps/glew/CMakeFiles/glew.dir/all
+src/CMakeFiles/meshedit.dir/all: CGL/src/CMakeFiles/CGL.dir/all
 src/CMakeFiles/meshedit.dir/all: CGL/deps/glfw/src/CMakeFiles/glfw.dir/all
 	$(MAKE) -f src/CMakeFiles/meshedit.dir/build.make src/CMakeFiles/meshedit.dir/depend
 	$(MAKE) -f src/CMakeFiles/meshedit.dir/build.make src/CMakeFiles/meshedit.dir/build

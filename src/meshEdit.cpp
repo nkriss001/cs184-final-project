@@ -8,9 +8,26 @@
 
 namespace CGL {
 
+  ////////// POINT CLOUD FUNCTIONS //////////
+
+  void MeshEdit::draw_point_clouds()
+  {
+    for ( vector<PointCloudNode>::iterator n = pointCloudNodes.begin(); n != pointCloudNodes.end(); n++ )
+    {
+      renderPointCloud( n->point_cloud );
+    }
+
+    // Execute all of the OpenGL commands.
+    glFlush();
+  }  
+
+  ///////////////////////////////////////////
+
+
   void MeshEdit::init()
   {
     smoothShading = false;
+    pointCloudMode = false;
     shadingMode = false;
     shaderProgID = loadShaders("shader/vert", "shader/frag");
     if(!shaderProgID)
@@ -111,7 +128,11 @@ namespace CGL {
   void MeshEdit::render()
   {
     update_camera();
-    draw_meshes();
+    if (pointCloudMode) {
+      draw_point_clouds();
+    } else {
+      draw_meshes();
+    }
 
     // // Draw the helpful picking messages.
     if (showHUD)
@@ -419,6 +440,9 @@ namespace CGL {
               case MATERIAL:
               init_material(static_cast<Material&>(*instance));
               break;
+              case POINTCLOUD:
+              init_point_cloud(static_cast<PointCloud&>(*instance));
+              break;
             }
 
           }
@@ -527,6 +551,37 @@ namespace CGL {
           return;
 
         }
+
+
+        ////////// POINT CLOUD FUNCTIONS //////////
+
+        void MeshEdit::init_point_cloud( PointCloud& pc )
+        {
+
+          PointCloudNode pointCloudNode( pc );
+          pointCloudNodes.push_back( pointCloudNode );
+
+          Vector3D low, high;
+          pointCloudNode.getBounds( low, high );
+
+          Vector3D centroid;
+          pointCloudNode.getCentroid( centroid );
+
+          // Determine how far away the camera should be.
+          // Minimum distance guaranteed to not clip into the model in C - V.
+          canonical_view_distance = (high - low).norm()*1.01; // norm is magnitude.
+          min_view_distance = canonical_view_distance / 10.0;
+          view_distance     = canonical_view_distance*2.;
+          max_view_distance = canonical_view_distance*20.;
+
+          camera_angles = Vector3D(0., 0., 0.);
+          view_focus    = centroid;
+          up = Z_UP;
+
+        }
+
+        ///////////////////////////////////////////
+
 
         void MeshEdit::mouseP(e_mouse_button b)
         {
@@ -1169,16 +1224,81 @@ namespace CGL {
 
                   //===================== End of MeshEdit class.
 
-
-                  //************************************************************************/
-                  // ----------------------- Mesh Node functions. --------------------------/
-                  //  **********************************************************************/
-
                   inline void setColor(Color & c)
                   {
                     // FIXME? : Incorporate antialiasing.
                     glColor3f(c.r, c.g, c.b);
                   }
+
+
+                  //************************************************************************/
+                  // -------------------- Point Cloud Node functions. ----------------------/
+                  //  **********************************************************************/
+
+                  void PointCloudNode::getBounds(Vector3D& low, Vector3D& high)
+                  {
+                    double maxValue = numeric_limits<double>::max();
+
+                    low.x = maxValue;
+                    high.x = -maxValue;
+                    low.y = maxValue;
+                    high.y = -maxValue;
+                    low.z = maxValue;
+                    high.z = -maxValue;
+
+                    for (Vector3D p : point_cloud.points) {
+                      low.x = min(low.x, p.x);
+                      low.y = min(low.y, p.y);
+                      low.z = min(low.z, p.z);
+
+                      high.x = max(high.x, p.x);
+                      high.y = max(high.y, p.y);
+                      high.z = max(high.z, p.z);
+                    }
+                  }
+
+
+                  void PointCloudNode::getCentroid(Vector3D& centroid)
+                  {
+                    centroid = Vector3D(0., 0., 0.);
+
+                    for (Vector3D p : point_cloud.points) {
+                      centroid += p;
+                    }
+
+                    centroid /= (double) point_cloud.points.size();
+                  }
+
+
+                  void MeshEdit::renderPointCloud(PointCloud& pc)
+                  {
+                    drawPoints( pc );
+                  }
+
+                  void MeshEdit::drawPoints(PointCloud& pc)
+                  {
+                    glEnable(GL_PROGRAM_POINT_SIZE);
+
+                    glDisable(GL_DEPTH_TEST);
+
+                    // setElementStyle
+                    DrawStyle *style = &defaultStyle;
+                    setColor(style->vertexColor);
+                    glPointSize(style->vertexRadius);
+
+                    for (Vector3D p : pc.points) {
+                      glBegin(GL_POINTS);
+                      glVertex3d(p.x, p.y, p.z);
+                      glEnd();
+                    }
+
+                    glEnable(GL_DEPTH_TEST);
+                  }
+
+
+                  //************************************************************************/
+                  // ----------------------- Mesh Node functions. --------------------------/
+                  //  **********************************************************************/
 
                   void MeshEdit::renderMesh( HalfedgeMesh& mesh )
                   {

@@ -161,6 +161,7 @@ src/CMakeFiles/meshedit.dir/main.cpp.o
  /home/cs184/cs184/projects/cs184-final-project/src/mesh.h
  /home/cs184/cs184/projects/cs184-final-project/src/meshEdit.h
  /home/cs184/cs184/projects/cs184-final-project/src/png.h
+ /home/cs184/cs184/projects/cs184-final-project/src/pointCloud.h
  /home/cs184/cs184/projects/cs184-final-project/src/scene.h
  /home/cs184/cs184/projects/cs184-final-project/src/shaderUtils.h
  /home/cs184/cs184/projects/cs184-final-project/src/student_code.h
@@ -235,6 +236,7 @@ src/CMakeFiles/meshedit.dir/meshEdit.cpp.o
  /home/cs184/cs184/projects/cs184-final-project/src/meshEdit.cpp
  /home/cs184/cs184/projects/cs184-final-project/src/meshEdit.h
  /home/cs184/cs184/projects/cs184-final-project/src/png.h
+ /home/cs184/cs184/projects/cs184-final-project/src/pointCloud.h
  /home/cs184/cs184/projects/cs184-final-project/src/scene.h
  /home/cs184/cs184/projects/cs184-final-project/src/shaderUtils.h
  /home/cs184/cs184/projects/cs184-final-project/src/student_code.h

@@ -14,6 +14,10 @@ using namespace CGL;
 
 #define msg(s) cerr << "[Collada Viewer] " << s << endl;
 
+
+void loadPlyFile(const char * path, std::vector<Vector3D> &points);
+
+
 int loadFile(MeshEdit* collada_viewer, const char* path) {
 
   Scene* scene = new Scene();
@@ -51,6 +55,26 @@ int loadFile(MeshEdit* collada_viewer, const char* path) {
     node.instance = mesh;
     scene->nodes.push_back(node);
   }
+  else if (path_str.substr(path_str.length()-4, 4) == ".ply")
+  {
+    Camera* cam = new Camera();
+    cam->type = CAMERA;
+    Node node;
+    node.instance = cam;
+    scene->nodes.push_back(node);
+
+    std::vector<Vector3D> points;
+    loadPlyFile(path, points);
+
+    PointCloud* pc = new PointCloud();
+    pc->type = POINTCLOUD;
+    pc->points = points;
+
+    node.instance = pc;
+    scene->nodes.push_back(node);
+
+    collada_viewer->pointCloudMode = true;
+  }
   else
   {
     return -1;
@@ -65,6 +89,45 @@ int loadFile(MeshEdit* collada_viewer, const char* path) {
   glActiveTexture(GL_TEXTURE2);
 
   return 0;
+}
+
+void loadPlyFile(const char * path, std::vector<Vector3D> &points) {
+  std::cout << "Loading PLY file" << endl;
+  FILE* file = fopen(path, "r");
+
+  char word[64];
+  int num_vertices;
+  while (true) {
+
+    fscanf(file, "%s", word);
+
+    if (strcmp(word, "element") == 0) {
+      char element[64];
+      fscanf(file, "%s", element);
+
+      if (strcmp(element, "vertex") == 0) {
+        fscanf(file, "%d", &num_vertices);
+      }
+    }
+
+    if (strcmp(word, "end_header") == 0) {
+      break;
+    }
+
+  }
+
+  for (int _ = num_vertices; _--; _ > 0) {
+
+    float x, y, z;
+    fscanf(file, "%f", &x);
+    fscanf(file, "%f", &y);
+    fscanf(file, "%f", &z);
+    Vector3D point = Vector3D(x, y, z);
+    points.push_back(point);
+    
+  }
+
+  fclose(file);
 }
 
 int main( int argc, char** argv ) {
