@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+</style>
+<title>CS 184 Final Project</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+  
+<body>
+
+<h1 align="middle">CS 184 Final Project Proposal: Triangle Mesh Generation from Point Clouds</h1>
+<h2 align="middle">Allan Levy (26721352), Joe Reid (26845757), Nicholas Kriss (26141698)</h2>
+
+<br><br>
+
+<div>
+
+  <h2 align="middle">Summary</h2>
+  <p>We intend to reproduce the Ball Pivoting Algorithm (BPA) introduced <a href="http://www.research.ibm.com/vistechnology/pdf/bpa_tvcg.pdf">here</a>. By following the pseudocode presented in the paper, we intend to create meshes for any point cloud object in such a way which is robust to noise from the dataset and can be extended in a much more accurate and efficient fashion.
+  </p>
+  
+  <h2 align="middle">Problem Description</h2>
+  <p> In Project 2 we implemented Loop Subdivision of triangle meshes, which enables flipping edges, splitting edges, and upsampling entire meshes. However, what do you do when you are not provided with a mesh to begin with? With point clouds it is not immediately obvious how to construct a mesh to begin with, and as 3D scanners and printers become more and more common, this becomes an even more important issue to tackle. Creating a mesh from point input data is a tricky problem to solve because for each point there may be hundreds of different ways to connect it with the points nearest to it, which makes it challenging to create a mesh structure that accurately represents the object. To solve this problem we plan to implement the BPA, introduced above. In this algorithm, a sphere of a chosen radius is imagined to touch 3 vertices, while encompassing no other points - these points are chosen to form a triangle in the mesh. Then, one of these 3 edges is chosen, and the sphere rotates around this edge until it comes in contact with another point, which is chosen as the third vertex for another triangle. This algorithm is continued with various sphere radii until a mesh structure has been formed.
+  </p>
+  
+  <h2 align="middle">Goals and Deliverables</h2>
+  <p>As a baseline, we will implement the Ball Pivoting Algorithm, specifically sections IV-A through D in the research paper. That is, we will be able to create a triangle mesh from an appropriately dense and evenly sampled point cloud. We will test this algorithm on models from the Stanford 3D repository with different ball radii and different mesh cloud sizes, and qualitatively compare the results of the algorithm with the actual triangle meshes produced by our basic Project 2 code. We will also quantitatively compare the results by seeing what percentage of the edges in our BPA-generated meshes also appear in the actual triangle meshes. With this analysis, we plan to answer how effective and accurate BPA is for different input parameters.
+  <br><br>
+  Once we can successfully convert a point cloud into a triangle mesh, we hope to improve our model and potentially implement a more complex model to compare and contrast with the original. Our first expansion will be adaptive mesh detail, as described in part IV-F of the paper. By running BPA with varied ball radii, we can create a mesh with more or less detail as required by the area in question. If a portion of the point cloud is especially flat, we can reduce it to fewer triangles. If we have additional time, we will implement part IV-E of the paper, which divides the point cloud into arbitrary portions which can be cached to save memory and speed up runtime. If all of this goes especially smoothly and we are left with significantly more time than expected, we will implement <a href="http://hhoppe.com/poissonrecon.pdf">Poisson Surface Reconstruction</a>, a more complex but more accurate model for mesh creation. This will allow us to compare the two methods and better understand the mesh creation process as a whole.
+  </p>
+  
+  <h2 align="middle">Schedule</h2>
+  <ul>
+    <li>By Mon. 4/16: Project skeleton developed, tests in place, and progress made towards basic point cloud to mesh algorithm.</li>
+    <li>By Mon. 4/23: Basic point cloud to mesh algorithm complete.</li>
+    <li>By Mon. 4/30: Edge case handling implemented.</li>
+    <li>By Fri. 5/4: First (and maybe second?) extensions explored.</li>
+  </ul>
+  
+  <h2 align="middle">Resources</h2>
+  <ul>
+    <li>Hive computers</li>
+    <li>HP Envy laptop with a GTX 850</li>
+    <li>The Ball-Pivoting Algorithm for Surface Reconstruction: <a href="http://www.research.ibm.com/vistechnology/pdf/bpa_tvcg.pdf">http://www.research.ibm.com/vistechnology/pdf/bpa_tvcg.pdf</a></li>
+    <li>Poisson Surface Reconstruction: <a href="http://hhoppe.com/poissonrecon.pdf">http://research.microsoft.com/en-us/um/people/hoppe/poissonrecon.pdf</a></li>
+    <li>The Stanford 3D Scanning Repository: <a href="http://graphics.stanford.edu/data/3Dscanrep/">http://graphics.stanford.edu/data/3Dscanrep/</a></li>
+  </ul>
+  <p>We will also use some of the starter code for Project 2 to help produce images of the final meshes.</p>
+ 
+</body>
+</html>
