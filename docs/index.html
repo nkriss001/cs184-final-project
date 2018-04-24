@@ -62,25 +62,4 @@
   <p>We will also use some of the starter code for Project 2 to help produce images of the final meshes.</p>
  
 </body>
-  
-  <body>
-
-    <h1 align="middle">Milestone Deliverables</h1>
-
-<br><br>
-
-<div>
-
-  <h2 align="middle">PLY Files and Point Cloud Display</h2>
-  <p>At this point in the project, we have written a program to parse ply files and display a point cloud. Currently, this program only works on ply files containing vertex positions, and cannot yet display a full ply mesh with edges and faces. Also, the ply files we are using from <a href="http://graphics.stanford.edu/data/3Dscanrep/">http://graphics.stanford.edu/data/3Dscanrep/</a> do not include vertex normals, which are necessary so that the ball pivot algorithm only creates orientable manifold objects. When we began the project, we did not consider that most of our test files would be a different format than the dae files expected by the existing meshedit framework, so this portion of the project took up more time than expected. We also need to add time to somehow add vertex normals to the point cloud. Our current plan is to either obtain vertex normals by averaging across face normals in the completed meshes, or convert the dae files supplied in this class, which do have vertex normals, to ply files so that we can use our current point cloud framework.
-  </p>
-  
-  <h2 align="middle">The Ball Pivot Algorithm</h2>
-  <p> Our main progress has been in writing the pseudocode and basic framework for the ball pivot algorithm. This code is still very informal, but the basic layout and necessary functions are all present. Our current program includes five functions. The actual algorithm replaced the MeshResampler::upsample function in student_code.cpp in Project 2, so that there is an existing framework to run the program from the meshedit GUI. Also, until we can get vertex normals, we are simply taking in existing complete meshes and stripping all features except the vertices. We still need to add the voxel grid structure, so that mesh construction does not take prohibitively long. The seed_triangle function, which returns a new seed triangle when the front is empty, is mostly completed except for a few C++ related errors. We have completed the checks to create the sphere touching all three points, make sure that sphere does not contain any other points, and make sure that the vertex normals point in the same direction compared to the face normal. The join and glue methods will add edges, faces, halfedges and boundaries to the mesh while potentially removing edges from the front. Adding elements to the mesh should not be too difficult. Finally, we have a completed function to find the center of a sphere of a given radius that touches three points in space.
-  </p>
-  
-  <h2 align="middle">Updated Goals</h2>
-  <p> We are mostly on track with our original project schedule regarding the ball point algorithm. We have the basic algorithm present, except for a few minor checks and necessary speed improvements. Also, now that we’ve started writing the code the algorithm has become clearer, and we will hopefully need less time to find bugs. However, we will need more time than expected to actually obtain the point clouds to use the algorithm on. Our new plan is to:
-  </p>
-</body>
 </html>
