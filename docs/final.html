@@ -20,25 +20,60 @@
 <link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
 </head>
   
-  <body>
+<body>
 
-    <h1 align="middle">CS 184 Final Project Milestone Deliverables: Triangle Mesh Generation from Point Clouds</h1>
-    <h2 align="middle">Allan Levy (26721352), Joe Reid (26845757), Nicholas Kriss (26141698)</h2>
+  <h1 align="middle">CS 184 Final Project Milestone: Triangle Mesh Generation from Point Clouds</h1>
+  <h2 align="middle">Allan Levy (26721352), Joe Reid (26845757), Nicholas Kriss (26141698)</h2>
 
-<br><br>
+  <br><br>
 
-<div>
+  <div>
 
-  <h2 align="middle">PLY Files and Point Cloud Display</h2>
-  <p>At this point in the project, we have written a program to parse ply files and display a point cloud. Currently, this program only works on ply files containing vertex positions, and cannot yet display a full ply mesh with edges and faces. Also, the ply files we are using from <a href="http://graphics.stanford.edu/data/3Dscanrep/">http://graphics.stanford.edu/data/3Dscanrep/</a> do not include vertex normals, which are necessary so that the ball pivot algorithm only creates orientable manifold objects. When we began the project, we did not consider that most of our test files would be a different format than the dae files expected by the existing meshedit framework, so this portion of the project took up more time than expected. We also need to add time to somehow add vertex normals to the point cloud. Our current plan is to either obtain vertex normals by averaging across face normals in the completed meshes, or convert the dae files supplied in this class, which do have vertex normals, to ply files so that we can use our current point cloud framework.
-  </p>
-  
-  <h2 align="middle">The Ball Pivot Algorithm</h2>
-  <p> Our main progress has been in writing the pseudocode and basic framework for the ball pivot algorithm. This code is still very informal, but the basic layout and necessary functions are all present. Our current program includes five functions. The actual algorithm replaced the MeshResampler::upsample function in student_code.cpp in Project 2, so that there is an existing framework to run the program from the meshedit GUI. Also, until we can get vertex normals, we are simply taking in existing complete meshes and stripping all features except the vertices. We still need to add the voxel grid structure, so that mesh construction does not take prohibitively long. The seed_triangle function, which returns a new seed triangle when the front is empty, is mostly completed except for a few C++ related errors. We have completed the checks to create the sphere touching all three points, make sure that sphere does not contain any other points, and make sure that the vertex normals point in the same direction compared to the face normal. The join and glue methods will add edges, faces, halfedges and boundaries to the mesh while potentially removing edges from the front. Adding elements to the mesh should not be too difficult. Finally, we have a completed function to find the center of a sphere of a given radius that touches three points in space.
-  </p>
-  
-  <h2 align="middle">Updated Goals</h2>
-  <p> We are mostly on track with our original project schedule regarding the ball point algorithm. We have the basic algorithm present, except for a few minor checks and necessary speed improvements. Also, now that we’ve started writing the code the algorithm has become clearer, and we will hopefully need less time to find bugs. However, we will need more time than expected to actually obtain the point clouds to use the algorithm on. Our new plan is to:
-  </p>
+    <h2 align="middle">PLY Files and Point Cloud Display</h2>
+    <p>
+      At this point in the project, we have written a program to parse PLY files and display a point cloud. This is important because it allows us to visualize the data and to compare our completed mesh to after it has been constructed. Currently, this program only works on PLY files containing vertex positions, and has not yet been impmlemented to display a full PLY mesh with edges and faces. Also, the PLY files we are using from the <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3D Scanning Repository</a> do not include vertex normals, which are necessary so that the Ball Pivot Algorithm only creates orientable manifold objects. When we began the project, we did not consider that most of our test files would be a different format than the DAE files expected by the existing meshedit framework, so this portion of the project took up more time than expected. We also need to find a way to add vertex normals to the point cloud. For obtaining vertex normals, we have two options:
+      <ol>
+        <li>Average the surrounding face normals of a point supplied in the completed meshes that came with the PLY files</li>
+        <li>Convert the DAE files supplied in this class, which do have vertex normals, to PLY files so that we can use our current point cloud framework</li>
+      </ol>
+    </p>
+
+    <img src="images/bun000_point_cloud_1.png" align="middle"/>
+    <figcaption align="middle">Point cloud of the front of the Stanfurd Bunny</figcaption>
+
+    <img src="images/bun000_point_cloud_2.png" align="middle"/>
+    <figcaption align="middle">Point cloud of the front of the Stanfurd Bunny</figcaption>
+
+    <img src="images/bun000_point_cloud_3.png" align="middle"/>
+    <figcaption align="middle">Point cloud of the front of the Stanfurd Bunny</figcaption>
+    
+
+    <h2 align="middle">The Ball Pivot Algorithm</h2>
+    <p><pre></pre>
+      Our main progress has been in writing the pseudocode and basic framework for the Ball Pivot Algorithm. The basic layout and necessary functions are all present. Our current program includes five functions. The actual algorithm replaces the <pre>MeshResampler::upsample</pre> function in <pre>student_code.cpp</pre> in Project 2, so that there is an existing framework to run the program from the meshedit GUI. Also, until we add in the vertex normals, we are simply taking in existing complete meshes and stripping all features except the vertices. We still need to add the voxel grid structure, so that mesh construction does not take prohibitively long. The <pre>seed_triangle</pre> function, which returns a new seed triangle when the front is empty, is mostly complete except for a few syntax errors. We have completed the checks to create the sphere touching all three points, ensuring that it does not contain any other points and that the vertex normals point in the same direction as the face normal. The <pre>join</pre> and <pre>glue</pre> methods will add edges, faces, halfedges and boundaries to the mesh while potentially removing edges from the front. Adding elements to the mesh should not be too difficult. Finally, we have a completed function to find the center of a sphere of a given radius that touches three points in space.
+    </p>
+    
+
+    <h2 align="middle">Updated Goals</h2>
+    <p>
+      We are mostly on track with our original project schedule regarding the Ball Pivot Algorithm. We have the basic algorithm present, except for a few minor checks and necessary speed improvements. Also, now that we’ve started writing the code the algorithm has become clearer, we will hopefully need less time to find bugs. However, we will need more time than expected to actually obtain the point clouds to use the algorithm on. Going forward, our new plan is to spend the next week experimenting with the two options above for finding the point normals. We will also finish correcting the syntax of the Ball Pivot Algorithm pseudocode. If there is any time left, we will attempt to speed up the mesh construction, which, according to the <a href="https://vgc.poly.edu/~csilva/papers/tvcg99.pdf">Bernardini, Mittleman, Rushmeier paper on BPA</a>, can take a long time. 
+    </p>
+
+
+    <h2 align="middle">Slides</h2>
+    <p>
+      The milestone slides are located <a href="https://docs.google.com/presentation/d/12HdG4qveV3iGW-9bLLuMkweyUPQy-euvC--WTN_Vl9c/edit?usp=sharing">here</a>.
+    </p>
+
+
+    <h2 align="middle">Video</h2>
+    <video>
+      <source src="videos/milestone.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+
+  </div>
+
+
 </body>
 </html>
