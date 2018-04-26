@@ -1,4 +1,4 @@
-#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
 
 #IncludeRegexScan: ^.*$
 
@@ -58,19 +58,19 @@ GL/glext.h
 GL/glu.h
 -
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/base64.cpp
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/base64.cpp
 base64.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/base64.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/base64.h
 iostream
 -
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/base64.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/base64.h
 string
 -
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/color.cpp
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/color.cpp
 color.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/color.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/color.h
 stdio.h
 -
 string.h
@@ -80,97 +80,97 @@ ostream
 sstream
 -
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/color.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/color.h
 string
 -
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/complex.cpp
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/complex.cpp
 complex.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/complex.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/complex.h
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/complex.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/complex.h
 vector2D.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/vector2D.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/vector2D.h
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/console.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/console.h
 ostream
 -
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/matrix3x3.cpp
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/matrix3x3.cpp
 matrix3x3.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/matrix3x3.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/matrix3x3.h
 iostream
 -
 cmath
 -
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/matrix3x3.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/matrix3x3.h
 iosfwd
 -
 vector3D.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/vector3D.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/vector3D.h
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/matrix4x4.cpp
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/matrix4x4.cpp
 matrix4x4.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/matrix4x4.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/matrix4x4.h
 iostream
 -
 cmath
 -
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/matrix4x4.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/matrix4x4.h
 iosfwd
 -
 vector4D.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/vector4D.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/vector4D.h
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/osdtext.cpp
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/osdtext.cpp
 osdtext.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/osdtext.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/osdtext.h
 iostream
 -
 ft2build.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/ft2build.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/ft2build.h
 base64.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/base64.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/base64.h
 console.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/console.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/console.h
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/osdtext.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/osdtext.h
 string
 -
 vector
 -
 GL/glew.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/GL/glew.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/GL/glew.h
 color.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/color.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/color.h
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/quaternion.cpp
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/quaternion.cpp
 quaternion.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/quaternion.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/quaternion.h
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/quaternion.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/quaternion.h
 iosfwd
 -
 vector4D.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/vector4D.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/vector4D.h
 vector3D.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/vector3D.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/vector3D.h
 matrix4x4.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/matrix4x4.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/matrix4x4.h
 matrix3x3.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/matrix3x3.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/matrix3x3.h
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/renderer.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/renderer.h
 stdio.h
 -
 string
 -
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/tinyxml2.cpp
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/tinyxml2.cpp
 tinyxml2.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/tinyxml2.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/tinyxml2.h
 new
 -
 stddef.h
@@ -178,7 +178,7 @@ stddef.h
 cstddef
 -
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/tinyxml2.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/tinyxml2.h
 ctype.h
 -
 limits.h
@@ -208,41 +208,41 @@ android/log.h
 assert.h
 -
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/vector2D.cpp
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/vector2D.cpp
 vector2D.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/vector2D.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/vector2D.h
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/vector2D.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/vector2D.h
 ostream
 -
 cmath
 -
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/vector3D.cpp
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/vector3D.cpp
 vector3D.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/vector3D.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/vector3D.h
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/vector3D.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/vector3D.h
 ostream
 -
 cmath
 -
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/vector4D.cpp
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/vector4D.cpp
 vector4D.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/vector4D.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/vector4D.h
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/vector4D.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/vector4D.h
 ostream
 -
 cmath
 -
 vector3D.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/vector3D.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/vector3D.h
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/viewer.cpp
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/viewer.cpp
 viewer.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/viewer.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/viewer.h
 stdio.h
 -
 cmath
@@ -254,23 +254,23 @@ iostream
 algorithm
 -
 GL/glew.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/GL/glew.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/GL/glew.h
 console.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/console.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/console.h
 
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/viewer.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/viewer.h
 renderer.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/renderer.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/renderer.h
 osdtext.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/osdtext.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/osdtext.h
 chrono
 -
 GLFW/glfw3.h
-/home/cs184/cs184/projects/cs184-final-project/CGL/src/GLFW/glfw3.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/CGL/src/GLFW/glfw3.h
 
-/usr/include/freetype2/config/ftheader.h
+/usr/local/freetype2/freetype/config/ftheader.h
 
-/usr/include/freetype2/ft2build.h
-config/ftheader.h
+/usr/local/freetype2/ft2build.h
+freetype/config/ftheader.h
 -
 
