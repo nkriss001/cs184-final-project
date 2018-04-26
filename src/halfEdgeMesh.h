@@ -680,7 +680,6 @@ if (f->halfedge() == h)
               << elementAddress(he) << endl;
             }
          }
-      protected:
 
          /**
           * Here's where the mesh elements are actually stored---this is the one

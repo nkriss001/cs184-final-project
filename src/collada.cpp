@@ -167,7 +167,6 @@ namespace CGL {
         }
       }
     }
-
     return 0;
 
   }

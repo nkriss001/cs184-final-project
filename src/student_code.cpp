@@ -256,7 +256,6 @@ namespace CGL
     return v5;
   }
 
-
   void MeshResampler::upsample( HalfedgeMesh& mesh )
   {
     // TODO Part 6.
@@ -271,7 +270,191 @@ namespace CGL
     // TODO Compute new positions for all the vertices in the input mesh, using the Loop subdivision rule,
     // TODO and store them in Vertex::newPosition. At this point, we also want to mark each vertex as being
     // TODO a vertex of the original mesh.
-    for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
+
+
+    // This routine now runs the Ball Pivot Algorithm, starting with a complete mesh
+    // TODO: Implement voxel grid to make vertex traversal reasonable
+    // Strip all features of the mesh except for vertices
+    mesh.halfedges.clear();
+    mesh.edges.clear();
+    mesh.boundaries.clear();
+    mesh.faces.clear();
+
+    // Initialize the front, which is a linked list of edges that have been added
+    // to the mesh and might still be used as a pivot edge
+    double r = 1.0;
+    list<Edge> front;
+    list<Vertex> vertices = mesh.vertices;
+    list<Vertex> used;
+    list<Vertex> seed;
+    Vector3D center;
+
+    // We loop until we are no longer able to pivot or find a seed triangle
+    while (true) {
+      Vertex v0 = seed[0];
+      Vertex v1 = seed[1];
+      Vertex v2 = seed[2];
+
+      // We find an edge from the front to pivot around
+      while (!front.empty()) {
+        Vector3D m = 0.5*(v0.position + v1.position);
+        double R = (center - m).norm();
+        for (Vertex v : vertices) {
+          // We find the center of a sphere that touches the vertices of the pivot edge
+          // and another vertex
+          // TODO: Take the FIRST center along the circular rotation trajectory
+          if ((v.position - m).norm() <= 2*r) {
+            (c1, c2) = get_center(v0.position, v1.position, v.position);
+            // If v is not part of any triangle, we call join
+            // If v is part of the mesh, we call glue
+            if (!(v in used)) {
+              join(front, v, edge(v0, v1), vertices);
+            } else {
+              glue(front, v, edge(v0, v1), vertices);
+            }
+          }
+        }
+      }
+      
+      // If there is no active edge on the front, we find a new seed triangle and
+      // add that triangle to our mesh
+      pair<list<Vertex>, Vector3D> seed_pair = seed_triangle(vertices);
+      seed = seed_pair.first;
+      center = seed_pair.second;
+      HalfedgeIter h0 = newHalfedge();
+      HalfedgeIter h1 = newHalfedge();
+      HalfedgeIter h2 = newHalfedge();
+      EdgeIter e0 = newEdge();
+      EdgeIter e1 = newEdge();
+      EdgeIter e2 = newEdge();
+      FaceIter f0 = newFace();
+      //TODO: set halfedge mesh features
+      front.push_back(e0);
+      front.push_back(e1);
+      front.push_back(e2);
+      vertices.remove(v0);
+      vertices.remove(v1);
+      vertices.remove(v2);
+    }
+  }
+
+  pair<list<Vertex>, Vector3D> MeshResampler::seed_triangle(list<Vertex> vertices) {
+    // Give a list of unused vertices, finds two more vertices such that a sphere
+    // of radius r touches all three vertices and contains no other vertices
+    double r = 1.0;
+    list<Vertex> seed;
+    for (Vertex v : vertices) {
+      for (Vertex v1 : vertices) {
+        if ((v1.position - v.position).norm() <= 2*r && !(&v1 == &v)) {
+          for (Vertex v2 : vertices) {
+            if ((v2.position - v.position).norm() <= 2*r && !(&v2 == &v) && !(&v2 == &v1)) {
+              Vector3D p1 = v.position;
+              Vector3D p2 = v1.position;
+              Vector3D p3 = v2.position;
+              Vector3D p21 = p2-p1;
+              Vector3D p31 = p3-p1;
+              Vector3D n = cross(p21, p31);
+              // Check that the normals of the three vertices are consistent with the normal of the 
+              // triangle they form
+              if (!(dot(n, v.normal()) <= 0 && dot(n, v1.normal()) <= 0 && dot(n, v.normal()) <= 0)
+                || !(dot(n, v.normal()) >= 0 && dot(n, v1.normal()) >= 0 && dot(n, v.normal()) >= 0)) {
+                (c1, c2) = get_center(p1, p2, p3);
+
+                // Check that the spheres touching the three points are valid, i.e. contain no other data point
+                bool good1 = true;
+                bool good2 = true;
+                for (Vertex u : vertices) {
+                  if (!(&u == &v) && !(&u == &v1) && !(&u == &v2) && (u.position - c1).norm() <= r) {
+                    good1 = false;
+                    continue;
+                  }
+                  if (!(&u == &v) && !(&u == &v1) && !(&u == &v2) && (u.position - c2).norm() <= r) {
+                    good2 = false;
+                    continue;
+                  }
+                }
+                if (good1) {
+                  seed.push_back(v);
+                  seed.push_back(v1);
+                  seed.push_back(v2);
+                  return make_pair(seed, c1);
+                } else if (good2) {
+                  seed.push_back(v);
+                  seed.push_back(v1);
+                  seed.push_back(v2);
+                  return make_pair(seed, c2);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return make_pair(NULL, NULL);
+  }
+
+  list<Vector3D> MeshResampler::get_center(Vector3D p1, Vector3D p2, Vector3D p3) {
+    // https://stackoverflow.com/questions/11719168/how-do-i-find-the-sphere-center-from-3-points-and-radius
+    // Returns the possible centers of a sphere of radius r that touches the three given points
+    double r = 1.0;
+    Vector3D p21 = p2-p1;
+    Vector3D p31 = p3-p1;
+    Vector3D n = cross(p21, p31);
+    Vector3D p0 = cross(dot(p21, p21) * p31 - dot(p31, p31) * p21, n) / 2 / dot(n, n) + p1;
+    double t1 = sqrt((r*r - dot(p0 - p1, p0 - p1))/dot(n, n));
+    double t2 = -sqrt((r*r - dot(p0 - p1, p0 - p1))/dot(n, n));
+    Vector3D c1 = p0 + n * t1;
+    Vector3D c2 = p0 + n * t2;
+    return make_pair(c1, c2);
+  }
+
+  list<Edge> MeshResampler::join(list<Edge> front, Vertex vk, Edge e, list<Vertex> vertices) {
+    // Edge e has vertices vi and vj, and we want to add triangle (vi, vk, vj) to the mesh
+    // and add edges (vi, vk) and (vk, vj) and remove edge (vi, vj) from the front. We return the
+    // newly added edges for use in other functions.
+    HalfedgeIter h0 = newHalfedge();
+    HalfedgeIter h1 = newHalfedge();
+    HalfedgeIter h2 = newHalfedge();
+    EdgeIter eik = newEdge();
+    EdgeIter ekj = newEdge();
+    EdgeIter eji = newEdge();
+    FaceIter f0 = newFace();
+    //TODO: set halfedge mesh features
+    front.push_back(eik);
+    front.push_back(ekj);
+    front.push_back(eji);
+    vertices.remove(vi);
+    vertices.remove(vj);
+    vertices.remove(vk);
+    front.remove(e);
+    front.push_back(ei);
+    front.push_back(ek);
+    return list<Edge>(ei, ek);
+  }
+    
+  void MeshResampler::glue(list<Edge> front, Vertex vk, Edge e, list<Vertex> vertices) {
+    // Edge e has vertices vi and vj.
+    for (Edge edge : front) {
+      // If vk is part of some edge in the front, we join. If either of the joined edges
+      // is coincident, i.e. connects the same two vertices but with opposite direction,
+      // to an existing edge in the front, we remove both edges from the front.
+      if (vk in edge) {
+        list<Edge> joined = join(front, vk, e, vertices);
+        for (Edge j : joined) {
+          if (coincident of j in front) {
+            front.remove(j);
+            front.remove(coincident);
+          }
+        }
+      } else {
+        // If vk is part of the mesh but not in the front, we cannot create triangle (vi, vk, vj) 
+        // since it would be non-manifold, so we know e is a boundary edge.
+        mark e as boundary edge;
+      }
+    }
+  }
+
+    /*for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
       v->isNew = false;
 
       int d = 0; // degree
@@ -349,11 +532,32 @@ namespace CGL
       }
     }
 
-
     // TODO Finally, copy the new vertex positions into final Vertex::position.
     for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
       v->position = v->newPosition;
     }
   }
 
+  void MeshResampler::ballpivot(list<Vector3D*> vertices, list<Vector3D*> normals, double radius) {
+    // TODO
+      // - Set up voxel grid (project 4 hashMap, but as a three-dimensional array)
+      // - If front is empty, use seed_triangle to get new seed triangle and triangle center
+      // - 
+      // - 
+
+  }
+
+  list<Vector3D*> MeshResampler::seed_triangle(list<Vector3D*> vertices, ) {
+    // TODO:
+      // - Pick a vertex that has not been used in triangulation (seed vertex)
+      // - Build a priority queue of pairs in its neighborhood in order of distance from seed
+      // - Test 1: For element in queue, determine if all normals point "outward" (at least in the same direction)
+      // - Test 2: Is there a point c on the outward side for which the distance to each proposed point is exactly r
+      // - If both tests pass, return seed triangle and seed point
+  }
+
+  // DATATYPES:
+    // - Front: collection of linked lists of edges
+    // - Edge: Includes endpoint 1, endpoint 2, opposite vertex, center of ball touching those three points, 
+    //   links to next & previous edges, active/boundary/frozen*/
 }
