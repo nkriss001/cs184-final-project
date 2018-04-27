@@ -385,6 +385,8 @@ mesh.h
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/mesh.h
 material.h
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/material.h
+pointCloud.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/pointCloud.h
 halfEdgeMesh.h
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/halfEdgeMesh.h
 student_code.h
@@ -415,6 +417,12 @@ map
 -
 vector
 -
+
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/pointCloud.h
+scene.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/scene.h
+material.h
+/Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/material.h
 
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/scene.cpp
 scene.h

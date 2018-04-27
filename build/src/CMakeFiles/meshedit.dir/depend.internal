@@ -161,6 +161,7 @@ src/CMakeFiles/meshedit.dir/main.cpp.o
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/mesh.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/meshEdit.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/png.h
+ /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/pointCloud.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/scene.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/shaderUtils.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/student_code.h
@@ -235,6 +236,7 @@ src/CMakeFiles/meshedit.dir/meshEdit.cpp.o
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/meshEdit.cpp
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/meshEdit.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/png.h
+ /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/pointCloud.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/scene.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/shaderUtils.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/student_code.h

@@ -160,6 +160,7 @@ src/CMakeFiles/meshedit.dir/main.cpp.o: ../src/mergeVertices.h
 src/CMakeFiles/meshedit.dir/main.cpp.o: ../src/mesh.h
 src/CMakeFiles/meshedit.dir/main.cpp.o: ../src/meshEdit.h
 src/CMakeFiles/meshedit.dir/main.cpp.o: ../src/png.h
+src/CMakeFiles/meshedit.dir/main.cpp.o: ../src/pointCloud.h
 src/CMakeFiles/meshedit.dir/main.cpp.o: ../src/scene.h
 src/CMakeFiles/meshedit.dir/main.cpp.o: ../src/shaderUtils.h
 src/CMakeFiles/meshedit.dir/main.cpp.o: ../src/student_code.h
@@ -234,6 +235,7 @@ src/CMakeFiles/meshedit.dir/meshEdit.cpp.o: ../src/mesh.h
 src/CMakeFiles/meshedit.dir/meshEdit.cpp.o: ../src/meshEdit.cpp
 src/CMakeFiles/meshedit.dir/meshEdit.cpp.o: ../src/meshEdit.h
 src/CMakeFiles/meshedit.dir/meshEdit.cpp.o: ../src/png.h
+src/CMakeFiles/meshedit.dir/meshEdit.cpp.o: ../src/pointCloud.h
 src/CMakeFiles/meshedit.dir/meshEdit.cpp.o: ../src/scene.h
 src/CMakeFiles/meshedit.dir/meshEdit.cpp.o: ../src/shaderUtils.h
 src/CMakeFiles/meshedit.dir/meshEdit.cpp.o: ../src/student_code.h
