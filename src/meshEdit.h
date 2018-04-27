@@ -11,6 +11,7 @@
 #include "light.h"
 #include "mesh.h"
 #include "material.h"
+#include "pointCloud.h"
 #include "halfEdgeMesh.h"
 #include "student_code.h"
 
@@ -197,6 +198,37 @@ namespace CGL {
 
    };// class MeshNode.
 
+   ////////// POINT CLOUD FUNCTIONS //////////
+
+   class PointCloudNode {
+    public:
+
+      PointCloud point_cloud;
+
+      // Constructor.
+      PointCloudNode(PointCloud& pc) {
+        point_cloud = pc;
+      }
+
+      // Destructor --- this destructor shouldn't be needed according to the
+      // C++ spec, though some compilers seem to complain if there isn't a
+      // default destructor explicitly defined.  (May be worth checking up on
+      // later!)
+      ~PointCloudNode() {
+      }
+
+      /* Returns the lower and upper corners of the axis aligned
+       * bounding box for the mesh
+       */
+      void getBounds(Vector3D& low, Vector3D& high);
+
+      // Centroid / weighted average point.
+      void getCentroid(Vector3D& centroid);
+
+    };// class PointCloudNode
+
+    ///////////////////////////////////////////
+
 
 // The viewer class the manages the viewing and rendering of Collada Files.
 class MeshEdit : public Renderer {
@@ -204,6 +236,8 @@ class MeshEdit : public Renderer {
 
   // --  Inherited public interface functions.
   ~MeshEdit() { }
+
+  bool pointCloudMode;
 
   virtual void init();
   virtual void render();
@@ -227,6 +261,7 @@ class MeshEdit : public Renderer {
   Scene* scene;
 
   vector<MeshNode> meshNodes;
+  vector<PointCloudNode> pointCloudNodes;
 
   // View Frustrum Variables.
   float hfov; // FIXME : I would like to specify the view frustrum
@@ -266,14 +301,16 @@ class MeshEdit : public Renderer {
   // -- Helper functions.
 
   // Initialization functions to get the opengl cooking with oil.
-  void init_camera   (Camera& camera     );
-  void init_light    (Light& light       );
-  void init_polymesh (Polymesh& polymesh );
-  void init_material (Material& material );
+  void init_camera      (Camera& camera     );
+  void init_light       (Light& light       );
+  void init_polymesh    (Polymesh& polymesh );
+  void init_material    (Material& material );
+  void init_point_cloud (PointCloud& pc     );
 
   // Control functions.
   void update_camera();
   void draw_meshes();
+  void draw_point_clouds();
 
   // Resets the camera to the canonical initial view position.
   void reset_camera();
@@ -285,6 +322,9 @@ class MeshEdit : public Renderer {
   void drawVertices ( HalfedgeMesh& mesh );
   void drawHalfedges( HalfedgeMesh& mesh );
   void drawHalfedgeArrow( Halfedge* h );
+
+  void renderPointCloud ( PointCloud& pc );
+  void drawPoints       ( PointCloud& pc );
 
   // Sets the draw style (colors, edge widths, etc.) for the specified
   // mesh element according to whether it is hovered or selected, using
@@ -359,6 +399,8 @@ class MeshEdit : public Renderer {
   void splitSelectedEdge( void );
   // Sets up and calls the MeshResampler with the appropiate operation.
   void mesh_up_sample();
+  // Sets up and calls the BallPivotAlgorithm with the appropriate operation.
+  void cloud_ball_pivot();
 
   // If a halfedge is selected, advances to the next or twin halfedge.
   void selectNextHalfedge( void );

@@ -491,6 +491,7 @@ namespace CGL
          }
 
         Matrix4x4 quadric;
+        Vector3D norm;
 
       protected:
          HalfedgeIter _halfedge; ///< one of the halfedges "rooted" or "based" at this vertex
@@ -680,7 +681,8 @@ if (f->halfedge() == h)
               << elementAddress(he) << endl;
             }
          }
-
+        public:
+        //protected:
          /**
           * Here's where the mesh elements are actually stored---this is the one
           * and only place we have actual data (rather than pointers/iterators).

@@ -22,7 +22,8 @@ namespace CGL {
     CAMERA,
     LIGHT,
     POLYMESH,
-    MATERIAL
+    MATERIAL,
+    POINTCLOUD
   } InstanceType;
 
   // An instance represents a generic object in the scene,
