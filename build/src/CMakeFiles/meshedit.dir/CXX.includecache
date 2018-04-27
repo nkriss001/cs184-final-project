@@ -236,6 +236,7 @@ CGL/CGL.h
 mesh.h
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/mesh.h
 
+<<<<<<< HEAD
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/camera.cpp
 camera.h
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/camera.h
@@ -289,6 +290,13 @@ halfEdgeMesh.h
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/halfEdgeMesh.h
 
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/halfEdgeMesh.h
+=======
+/home/cs184/cs184/projects/cs184-final-project/src/camera.h
+scene.h
+/home/cs184/cs184/projects/cs184-final-project/src/scene.h
+
+/home/cs184/cs184/projects/cs184-final-project/src/halfEdgeMesh.h
+>>>>>>> 522567eaeb81c26321e659aac76923cae68a55d4
 set
 -
 map
@@ -306,11 +314,19 @@ CGL/CGL.h
 mesh.h
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/mesh.h
 
+<<<<<<< HEAD
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/light.cpp
 light.h
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/light.h
 
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/light.h
+=======
+/home/cs184/cs184/projects/cs184-final-project/src/light.h
+scene.h
+/home/cs184/cs184/projects/cs184-final-project/src/scene.h
+
+/home/cs184/cs184/projects/cs184-final-project/src/material.h
+>>>>>>> 522567eaeb81c26321e659aac76923cae68a55d4
 scene.h
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/scene.h
 
@@ -402,6 +418,7 @@ algorithm
 
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/mutablePriorityQueue.h
 
+<<<<<<< HEAD
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/png.cpp
 png.h
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/png.h
@@ -413,10 +430,64 @@ iostream
 -
 
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/png.h
+=======
+/home/cs184/cs184/projects/cs184-final-project/src/meshEdit.cpp
+meshEdit.h
+/home/cs184/cs184/projects/cs184-final-project/src/meshEdit.h
+shaderUtils.h
+/home/cs184/cs184/projects/cs184-final-project/src/shaderUtils.h
+GL/glew.h
+/home/cs184/cs184/projects/cs184-final-project/src/GL/glew.h
+cmath
+-
+
+/home/cs184/cs184/projects/cs184-final-project/src/meshEdit.h
+string
+-
+vector
+-
+CGL/CGL.h
+/home/cs184/cs184/projects/cs184-final-project/src/CGL/CGL.h
+scene.h
+/home/cs184/cs184/projects/cs184-final-project/src/scene.h
+camera.h
+/home/cs184/cs184/projects/cs184-final-project/src/camera.h
+light.h
+/home/cs184/cs184/projects/cs184-final-project/src/light.h
+mesh.h
+/home/cs184/cs184/projects/cs184-final-project/src/mesh.h
+material.h
+/home/cs184/cs184/projects/cs184-final-project/src/material.h
+pointCloud.h
+/home/cs184/cs184/projects/cs184-final-project/src/pointCloud.h
+halfEdgeMesh.h
+/home/cs184/cs184/projects/cs184-final-project/src/halfEdgeMesh.h
+student_code.h
+/home/cs184/cs184/projects/cs184-final-project/src/student_code.h
+string
+-
+iostream
+-
+sstream
+-
+algorithm
+-
+
+/home/cs184/cs184/projects/cs184-final-project/src/png.h
+>>>>>>> 522567eaeb81c26321e659aac76923cae68a55d4
 map
 -
 vector
 -
+<<<<<<< HEAD
+=======
+
+/home/cs184/cs184/projects/cs184-final-project/src/pointCloud.h
+scene.h
+/home/cs184/cs184/projects/cs184-final-project/src/scene.h
+material.h
+/home/cs184/cs184/projects/cs184-final-project/src/material.h
+>>>>>>> 522567eaeb81c26321e659aac76923cae68a55d4
 
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/pointCloud.h
 scene.h
@@ -438,7 +509,11 @@ iostream
 CGL/CGL.h
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/CGL/CGL.h
 
+<<<<<<< HEAD
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/shaderUtils.h
+=======
+/home/cs184/cs184/projects/cs184-final-project/src/shaderUtils.h
+>>>>>>> 522567eaeb81c26321e659aac76923cae68a55d4
 GL/glew.h
 -
 OpenGL/gl.h
@@ -458,6 +533,7 @@ iostream
 vector
 -
 png.h
+<<<<<<< HEAD
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/png.h
 
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/student_code.cpp
@@ -465,6 +541,9 @@ student_code.h
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/student_code.h
 mutablePriorityQueue.h
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/mutablePriorityQueue.h
+=======
+/home/cs184/cs184/projects/cs184-final-project/src/png.h
+>>>>>>> 522567eaeb81c26321e659aac76923cae68a55d4
 
 /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/student_code.h
 halfEdgeMesh.h

@@ -23,6 +23,7 @@ set(CMAKE_MAKEFILE_DEPENDS
   "CMakeFiles/feature_tests.c"
   "CMakeFiles/feature_tests.cxx"
   "../src/CMakeLists.txt"
+<<<<<<< HEAD
   "/usr/local/Cellar/cmake/3.10.2/share/cmake/Modules/BasicConfigVersion-SameMajorVersion.cmake.in"
   "/usr/local/Cellar/cmake/3.10.2/share/cmake/Modules/CMakeCCompiler.cmake.in"
   "/usr/local/Cellar/cmake/3.10.2/share/cmake/Modules/CMakeCCompilerABI.c"
@@ -123,6 +124,37 @@ set(CMAKE_MAKEFILE_DEPENDS
   "/usr/local/Cellar/cmake/3.10.2/share/cmake/Modules/Platform/UnixPaths.cmake"
   "/usr/local/Cellar/cmake/3.10.2/share/cmake/Modules/SelectLibraryConfigurations.cmake"
   "/usr/local/Cellar/cmake/3.10.2/share/cmake/Modules/WriteBasicConfigVersionFile.cmake"
+=======
+  "/usr/share/cmake-2.8/Modules/BasicConfigVersion-SameMajorVersion.cmake.in"
+  "/usr/share/cmake-2.8/Modules/CMakeCInformation.cmake"
+  "/usr/share/cmake-2.8/Modules/CMakeCXXInformation.cmake"
+  "/usr/share/cmake-2.8/Modules/CMakeCommonLanguageInclude.cmake"
+  "/usr/share/cmake-2.8/Modules/CMakeGenericSystem.cmake"
+  "/usr/share/cmake-2.8/Modules/CMakePackageConfigHelpers.cmake"
+  "/usr/share/cmake-2.8/Modules/CMakeParseArguments.cmake"
+  "/usr/share/cmake-2.8/Modules/CMakeSystemSpecificInformation.cmake"
+  "/usr/share/cmake-2.8/Modules/CheckFunctionExists.cmake"
+  "/usr/share/cmake-2.8/Modules/CheckIncludeFiles.cmake"
+  "/usr/share/cmake-2.8/Modules/CheckLibraryExists.cmake"
+  "/usr/share/cmake-2.8/Modules/CheckSymbolExists.cmake"
+  "/usr/share/cmake-2.8/Modules/Compiler/GNU-C.cmake"
+  "/usr/share/cmake-2.8/Modules/Compiler/GNU-CXX.cmake"
+  "/usr/share/cmake-2.8/Modules/Compiler/GNU.cmake"
+  "/usr/share/cmake-2.8/Modules/FindFreetype.cmake"
+  "/usr/share/cmake-2.8/Modules/FindOpenGL.cmake"
+  "/usr/share/cmake-2.8/Modules/FindPackageHandleStandardArgs.cmake"
+  "/usr/share/cmake-2.8/Modules/FindPackageMessage.cmake"
+  "/usr/share/cmake-2.8/Modules/FindPkgConfig.cmake"
+  "/usr/share/cmake-2.8/Modules/FindThreads.cmake"
+  "/usr/share/cmake-2.8/Modules/FindX11.cmake"
+  "/usr/share/cmake-2.8/Modules/MultiArchCross.cmake"
+  "/usr/share/cmake-2.8/Modules/Platform/Linux-GNU-C.cmake"
+  "/usr/share/cmake-2.8/Modules/Platform/Linux-GNU-CXX.cmake"
+  "/usr/share/cmake-2.8/Modules/Platform/Linux-GNU.cmake"
+  "/usr/share/cmake-2.8/Modules/Platform/Linux.cmake"
+  "/usr/share/cmake-2.8/Modules/Platform/UnixPaths.cmake"
+  "/usr/share/cmake-2.8/Modules/WriteBasicConfigVersionFile.cmake"
+>>>>>>> 522567eaeb81c26321e659aac76923cae68a55d4
   )
 
 # The corresponding makefile is:
@@ -132,12 +164,16 @@ set(CMAKE_MAKEFILE_OUTPUTS
   )
 
 # Byproducts of CMake generate step:
+<<<<<<< HEAD
 set(CMAKE_MAKEFILE_PRODUCTS
   "CMakeFiles/3.10.2/CMakeSystem.cmake"
   "CMakeFiles/3.10.2/CMakeCCompiler.cmake"
   "CMakeFiles/3.10.2/CMakeCXXCompiler.cmake"
   "CMakeFiles/3.10.2/CMakeCCompiler.cmake"
   "CMakeFiles/3.10.2/CMakeCXXCompiler.cmake"
+=======
+SET(CMAKE_MAKEFILE_PRODUCTS
+>>>>>>> 522567eaeb81c26321e659aac76923cae68a55d4
   "CMakeFiles/CMakeDirectoryInformation.cmake"
   "CGL/CMakeFiles/CMakeDirectoryInformation.cmake"
   "CGL/deps/glew/CMakeFiles/CMakeDirectoryInformation.cmake"

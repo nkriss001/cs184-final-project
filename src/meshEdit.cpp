@@ -1275,6 +1275,7 @@ namespace CGL {
                       high.y = max(high.y, p.y);
                       high.z = max(high.z, p.z);
                     }
+<<<<<<< HEAD
                   }
 
 
@@ -1316,6 +1317,49 @@ namespace CGL {
                   }
 
 
+=======
+                  }
+
+
+                  void PointCloudNode::getCentroid(Vector3D& centroid)
+                  {
+                    centroid = Vector3D(0., 0., 0.);
+
+                    for (Vector3D p : point_cloud.points) {
+                      centroid += p;
+                    }
+
+                    centroid /= (double) point_cloud.points.size();
+                  }
+
+
+                  void MeshEdit::renderPointCloud(PointCloud& pc)
+                  {
+                    drawPoints( pc );
+                  }
+
+                  void MeshEdit::drawPoints(PointCloud& pc)
+                  {
+                    glEnable(GL_PROGRAM_POINT_SIZE);
+
+                    glDisable(GL_DEPTH_TEST);
+
+                    // setElementStyle
+                    DrawStyle *style = &defaultStyle;
+                    setColor(style->vertexColor);
+                    glPointSize(style->vertexRadius);
+
+                    for (Vector3D p : pc.points) {
+                      glBegin(GL_POINTS);
+                      glVertex3d(p.x, p.y, p.z);
+                      glEnd();
+                    }
+
+                    glEnable(GL_DEPTH_TEST);
+                  }
+
+
+>>>>>>> 522567eaeb81c26321e659aac76923cae68a55d4
                   //************************************************************************/
                   // ----------------------- Mesh Node functions. --------------------------/
                   //  **********************************************************************/

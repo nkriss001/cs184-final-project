@@ -149,6 +149,7 @@ src/CMakeFiles/meshedit.dir/main.cpp.o
  ../CGL/include/CGL/viewer.h
  ../CGL/include/GL/glew.h
  ../CGL/include/GLFW/glfw3.h
+<<<<<<< HEAD
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/bezierCurve.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/bezierPatch.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/camera.h
@@ -166,6 +167,25 @@ src/CMakeFiles/meshedit.dir/main.cpp.o
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/shaderUtils.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/student_code.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/texture.h
+=======
+ /home/cs184/cs184/projects/cs184-final-project/src/bezierCurve.h
+ /home/cs184/cs184/projects/cs184-final-project/src/bezierPatch.h
+ /home/cs184/cs184/projects/cs184-final-project/src/camera.h
+ /home/cs184/cs184/projects/cs184-final-project/src/collada.h
+ /home/cs184/cs184/projects/cs184-final-project/src/halfEdgeMesh.h
+ /home/cs184/cs184/projects/cs184-final-project/src/light.h
+ /home/cs184/cs184/projects/cs184-final-project/src/main.cpp
+ /home/cs184/cs184/projects/cs184-final-project/src/material.h
+ /home/cs184/cs184/projects/cs184-final-project/src/mergeVertices.h
+ /home/cs184/cs184/projects/cs184-final-project/src/mesh.h
+ /home/cs184/cs184/projects/cs184-final-project/src/meshEdit.h
+ /home/cs184/cs184/projects/cs184-final-project/src/png.h
+ /home/cs184/cs184/projects/cs184-final-project/src/pointCloud.h
+ /home/cs184/cs184/projects/cs184-final-project/src/scene.h
+ /home/cs184/cs184/projects/cs184-final-project/src/shaderUtils.h
+ /home/cs184/cs184/projects/cs184-final-project/src/student_code.h
+ /home/cs184/cs184/projects/cs184-final-project/src/texture.h
+>>>>>>> 522567eaeb81c26321e659aac76923cae68a55d4
 src/CMakeFiles/meshedit.dir/material.cpp.o
  ../CGL/include/CGL/CGL.h
  ../CGL/include/CGL/base64.h
@@ -226,6 +246,7 @@ src/CMakeFiles/meshedit.dir/meshEdit.cpp.o
  ../CGL/include/CGL/viewer.h
  ../CGL/include/GL/glew.h
  ../CGL/include/GLFW/glfw3.h
+<<<<<<< HEAD
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/bezierCurve.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/bezierPatch.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/camera.h
@@ -241,6 +262,23 @@ src/CMakeFiles/meshedit.dir/meshEdit.cpp.o
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/shaderUtils.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/student_code.h
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/texture.h
+=======
+ /home/cs184/cs184/projects/cs184-final-project/src/bezierCurve.h
+ /home/cs184/cs184/projects/cs184-final-project/src/bezierPatch.h
+ /home/cs184/cs184/projects/cs184-final-project/src/camera.h
+ /home/cs184/cs184/projects/cs184-final-project/src/halfEdgeMesh.h
+ /home/cs184/cs184/projects/cs184-final-project/src/light.h
+ /home/cs184/cs184/projects/cs184-final-project/src/material.h
+ /home/cs184/cs184/projects/cs184-final-project/src/mesh.h
+ /home/cs184/cs184/projects/cs184-final-project/src/meshEdit.cpp
+ /home/cs184/cs184/projects/cs184-final-project/src/meshEdit.h
+ /home/cs184/cs184/projects/cs184-final-project/src/png.h
+ /home/cs184/cs184/projects/cs184-final-project/src/pointCloud.h
+ /home/cs184/cs184/projects/cs184-final-project/src/scene.h
+ /home/cs184/cs184/projects/cs184-final-project/src/shaderUtils.h
+ /home/cs184/cs184/projects/cs184-final-project/src/student_code.h
+ /home/cs184/cs184/projects/cs184-final-project/src/texture.h
+>>>>>>> 522567eaeb81c26321e659aac76923cae68a55d4
 src/CMakeFiles/meshedit.dir/png.cpp.o
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/png.cpp
  /Users/nicholaskriss/Desktop/cs184/cs184-final-project/src/png.h
