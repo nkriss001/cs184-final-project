@@ -96,7 +96,7 @@
  * three boundaries: one at the waist, and two at the ankles.  These boundaries
  * are represented by special faces in our halfedge mesh---in fact, rather than
  * being stored in the usual list of faces (HalfedgeMesh::faces), they are
- * stored in a separae list of boundary loops (HalfedgeMesh::boundaries).  Each
+ * stored in a separate list of boundary loops (HalfedgeMesh::boundaries).  Each
  * face (boundary or regular) also stored a flag Face::_isBoundary that
  * indicates whether or not it is a boundary.  This value can be queried via the
  * public method Face::isBoundary() (again: encapsulation!)  So for instance, if
