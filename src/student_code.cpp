@@ -265,7 +265,7 @@ namespace CGL
 
   void MeshResampler::ballPivot(HalfedgeMesh& mesh) {
     // The radius of the ball we will pivot
-    double r = 1.0;
+    double r = 0.0001;
     double delta = 0.00001;
 
     // A vertex of all vertices in the point cloud
@@ -309,7 +309,7 @@ namespace CGL
 
     // The main ball-pivot algorithm
     int i = 0;
-    int j = 10;
+    int j = 1000;
     while (true) {
       while (!front.empty()) {
         // Get the vertices of the first edge on the front
