@@ -20,10 +20,13 @@ namespace CGL {
     HalfedgeCIter h = halfedge();
     do
     {
-      Vector3D pi = h->vertex()->position;
-      Vector3D pj = h->next()->vertex()->position;
-
-      N += cross( pi, pj );
+      VertexCIter pi = h->vertex();
+      VertexCIter pj = h->next()->vertex();
+      if (pi->norm[0] != INFINITY) {
+        N += (pi->norm)/3.0;
+      } else {
+        N += cross( pi->position, pj->position );
+      }
 
       h = h->next();
     }

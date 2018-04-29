@@ -491,7 +491,7 @@ namespace CGL
          }
 
         Matrix4x4 quadric;
-        Vector3D norm;
+        Vector3D norm = Vector3D(INFINITY, INFINITY, INFINITY);
 
       protected:
          HalfedgeIter _halfedge; ///< one of the halfedges "rooted" or "based" at this vertex

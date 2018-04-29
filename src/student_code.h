@@ -27,6 +27,7 @@ namespace CGL {
       EdgeIter e;
       VertexIter v1;
       VertexIter v2;
+      VertexIter v3;
     };
 
     friend bool operator==(const vertex_struct& v1, const vertex_struct& v2) {
@@ -41,12 +42,12 @@ namespace CGL {
     void ballPivot(HalfedgeMesh& mesh);
     int hash_position(Vector3D pos, double r, int grid_width, int grid_height);
     vector<Vector3D> get_centers(Vector3D p1, Vector3D p2, Vector3D p3, double r);
-    void join(HalfedgeMesh& mesh, list<edge_struct>& front, VertexIter vi, VertexIter vj, 
+    void join(HalfedgeMesh& mesh, list<edge_struct *>& front, VertexIter vi, VertexIter vj, 
       VertexIter vk, EdgeIter e_ij);
-    void glue(HalfedgeMesh& mesh, list<edge_struct> front, VertexIter vi, VertexIter vj, 
+    void glue(HalfedgeMesh& mesh, list<edge_struct *>& front, VertexIter vi, VertexIter vj, 
       VertexIter vk, EdgeIter e_ij);
-    Vector3D find_seed_triangle(HalfedgeMesh& mesh, vector<vector <vertex_struct> > voxels, 
-      vector<vertex_struct> vertices, list<edge_struct>& front, double r);
+    Vector3D find_seed_triangle(HalfedgeMesh& mesh, vector<vector <vertex_struct *> > voxels, 
+      vector<vertex_struct *> vertices, list<edge_struct *>& front, double r);
   };
 }
 
