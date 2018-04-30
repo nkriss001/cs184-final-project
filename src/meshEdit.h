@@ -401,6 +401,8 @@ class MeshEdit : public Renderer {
   void splitSelectedEdge( void );
   // Sets up and calls the MeshResampler with the appropiate operation.
   void mesh_up_sample();
+  // Sets up and calls the BallPivotAlgorithm with the appropriate operation.
+  void cloud_ball_pivot();
 
   // If a halfedge is selected, advances to the next or twin halfedge.
   void selectNextHalfedge( void );

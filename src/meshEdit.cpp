@@ -259,6 +259,11 @@ namespace CGL {
           mesh_up_sample();
           break;
 
+          case 'p':
+          case 'P':
+          cloud_ball_pivot();
+          break;
+
           case 'i':
           case 'I':
           showHUD = !showHUD;
@@ -1025,6 +1030,21 @@ namespace CGL {
                     hoveredFeature.invalidate();
                   }
 
+                  void MeshEdit::cloud_ball_pivot()
+                  {
+                    HalfedgeMesh* mesh;
+
+                    // If an element is selected, resample the mesh containing that
+                    // element; otherwise, resample the first mesh in the scene.
+                    mesh = &( meshNodes.begin()->mesh );
+                    resampler.ballPivot( *mesh );
+
+                    // Since the mesh may have changed, the selected and
+                    // hovered features may no longer point to valid elements.
+                    selectedFeature.invalidate();
+                    hoveredFeature.invalidate();
+                  }
+
                   inline void MeshEdit::drawString(float x, float y, string str, size_t size, Color c)
                   {
                     int line_index = text_mgr.add_line(( x*2/screen_w) - 1.0,
@@ -1296,7 +1316,6 @@ namespace CGL {
 
                     glEnable(GL_DEPTH_TEST);
                   }
-
 
                   //************************************************************************/
                   // ----------------------- Mesh Node functions. --------------------------/

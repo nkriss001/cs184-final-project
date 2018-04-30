@@ -1,5 +1,0 @@
-/home/cs184/cs184/projects/cs184-final-project/build/CGL/src/CMakeFiles/CGL.dir
-/home/cs184/cs184/projects/cs184-final-project/build/CGL/deps/glew/CMakeFiles/glew.dir
-/home/cs184/cs184/projects/cs184-final-project/build/CGL/deps/glfw/src/CMakeFiles/glfw.dir
-/home/cs184/cs184/projects/cs184-final-project/build/src/CMakeFiles/meshedit.dir
-/home/cs184/cs184/projects/cs184-final-project/build/CGL/deps/glfw/CMakeFiles/uninstall.dir

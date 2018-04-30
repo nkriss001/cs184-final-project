@@ -96,7 +96,7 @@
  * three boundaries: one at the waist, and two at the ankles.  These boundaries
  * are represented by special faces in our halfedge mesh---in fact, rather than
  * being stored in the usual list of faces (HalfedgeMesh::faces), they are
- * stored in a separae list of boundary loops (HalfedgeMesh::boundaries).  Each
+ * stored in a separate list of boundary loops (HalfedgeMesh::boundaries).  Each
  * face (boundary or regular) also stored a flag Face::_isBoundary that
  * indicates whether or not it is a boundary.  This value can be queried via the
  * public method Face::isBoundary() (again: encapsulation!)  So for instance, if
@@ -491,6 +491,7 @@ namespace CGL
          }
 
         Matrix4x4 quadric;
+        Vector3D norm = Vector3D(INFINITY, INFINITY, INFINITY);
 
       protected:
          HalfedgeIter _halfedge; ///< one of the halfedges "rooted" or "based" at this vertex
@@ -680,8 +681,8 @@ if (f->halfedge() == h)
               << elementAddress(he) << endl;
             }
          }
-      protected:
-
+        public:
+        //protected:
          /**
           * Here's where the mesh elements are actually stored---this is the one
           * and only place we have actual data (rather than pointers/iterators).
