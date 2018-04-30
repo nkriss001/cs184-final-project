@@ -292,6 +292,10 @@ namespace CGL {
           case 'Q':
           smoothShading = !smoothShading;
           break;
+          // case 'p':
+          // case 'P':
+          // pointCloud = !pointCloud;
+          // break;
           default:
           break;
         }
@@ -1033,7 +1037,7 @@ namespace CGL {
                     // If an element is selected, resample the mesh containing that
                     // element; otherwise, resample the first mesh in the scene.
                     mesh = &( meshNodes.begin()->mesh );
-                    resampler.ballPivot( *mesh );
+                    resampler.ballPivot( *mesh, BPAr );
 
                     // Since the mesh may have changed, the selected and
                     // hovered features may no longer point to valid elements.
@@ -1255,7 +1259,7 @@ namespace CGL {
                   // -------------------- Point Cloud Node functions. ----------------------/
                   //  **********************************************************************/
 
-                  void PointCloudNode::getBounds(Vector3D& low, Vector3D& high)
+                  void PointCloudNode::getBounds( Vector3D& low, Vector3D& high )
                   {
                     double maxValue = numeric_limits<double>::max();
 
@@ -1278,7 +1282,7 @@ namespace CGL {
                   }
 
 
-                  void PointCloudNode::getCentroid(Vector3D& centroid)
+                  void PointCloudNode::getCentroid( Vector3D& centroid )
                   {
                     centroid = Vector3D(0., 0., 0.);
 
@@ -1290,15 +1294,13 @@ namespace CGL {
                   }
 
 
-                  void MeshEdit::renderPointCloud(PointCloud& pc)
+                  void MeshEdit::renderPointCloud( PointCloud& pc )
                   {
                     drawPoints( pc );
                   }
 
-                  void MeshEdit::drawPoints(PointCloud& pc)
+                  void MeshEdit::drawPoints( PointCloud& pc )
                   {
-                    glEnable(GL_PROGRAM_POINT_SIZE);
-
                     glDisable(GL_DEPTH_TEST);
 
                     // setElementStyle
@@ -1321,24 +1323,34 @@ namespace CGL {
 
                   void MeshEdit::renderMesh( HalfedgeMesh& mesh )
                   {
-                    if(shadingMode)
-                    glUseProgram(shaderProgID);
-                    else
-                    glUseProgram(0);
-                    glEnable(GL_LIGHTING);
-                    drawFaces( mesh );
-                    glDisable(GL_LIGHTING);
+                    if (pointCloud) {
 
-                    glUseProgram(0);
+                      glUseProgram(0);
+                      drawPoints( mesh );
 
-                    if(!shadingMode)
-                    {
-                      // Edges are drawn with flat shading.
-                      drawEdges( mesh );
+                    } else {
 
-                      drawVertices( mesh );
-                      drawHalfedges( mesh );
+                      if(shadingMode)
+                      glUseProgram(shaderProgID);
+                      else
+                      glUseProgram(0);
+                      glEnable(GL_LIGHTING);
+                      drawFaces( mesh );
+                      glDisable(GL_LIGHTING);
+
+                      glUseProgram(0);
+
+                      if(!shadingMode)
+                      {
+                        // Edges are drawn with flat shading.
+                        drawEdges( mesh );
+
+                        drawVertices( mesh );
+                        drawHalfedges( mesh );
+                      }
+
                     }
+
                   }
 
                   // Sets the current OpenGL color/style of a given mesh element, according to which elements are currently selected and hovered.
@@ -1462,6 +1474,25 @@ namespace CGL {
                     }
 
                     glEnable( GL_DEPTH_TEST );
+                  }
+
+                  void MeshEdit::drawPoints( HalfedgeMesh& mesh )
+                  {
+                    glDisable(GL_DEPTH_TEST);
+
+                    // setElementStyle
+                    DrawStyle *style = &defaultStyle;
+                    setColor(style->vertexColor);
+                    glPointSize(style->vertexRadius);
+
+                    for( VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++ ) {
+                      Vector3D p = v->position;
+                      glBegin(GL_POINTS);
+                      glVertex3d(p.x, p.y, p.z);
+                      glEnd();
+                    }
+
+                    glEnable(GL_DEPTH_TEST);
                   }
 
                   void MeshEdit::drawHalfedgeArrow( Halfedge* h )
