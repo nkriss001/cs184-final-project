@@ -46,8 +46,8 @@ namespace CGL {
       VertexIter vk, EdgeIter e_ij);
     void glue(HalfedgeMesh& mesh, list<edge_struct *>& front, VertexIter vi, VertexIter vj, 
       VertexIter vk, EdgeIter e_ij);
-    Vector3D find_seed_triangle(HalfedgeMesh& mesh, vector<vector <vertex_struct *> > voxels, 
-      vector<vertex_struct *> vertices, list<edge_struct *>& front, double r);
+    Vector3D find_seed_triangle(HalfedgeMesh& mesh, vector<vector <vertex_struct *> >& voxels, 
+      vector<vertex_struct *> vertices, list<edge_struct *>& front, Vector3D dimensions, double r);
   };
 }
 
