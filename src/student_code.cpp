@@ -263,9 +263,9 @@ namespace CGL
     return floor(box.x + box.y * grid_width + box.z * grid_width * grid_height);
   }
 
-  void MeshResampler::ballPivot(HalfedgeMesh& mesh) {
+  void MeshResampler::ballPivot(HalfedgeMesh& mesh, double BPAr) {
     // The radius of the ball we will pivot
-    double r = 2.0;
+    double r = BPAr;
     double delta = 0.00001;
 
     // A vertex of all vertices in the point cloud
@@ -309,7 +309,7 @@ namespace CGL
 
     // The main ball-pivot algorithm
     int i = 0;
-    int j = 3;
+    int j = 10000;
     while (true) {
       while (!front.empty()) {
         // Get the vertices of the first edge on the front
@@ -341,7 +341,7 @@ namespace CGL
                     if (e_ik.norm() <= 2*r && e_jk.norm() <= 2*r && abs(cosTheta) != 1) {
                       Vector3D rotate_face_normal = cross(vi->position - vk->position, vj->position - vk->position);
                       Vector3D new_face_normal = (vi->norm + vj->norm + vk->norm)/3.0;
-                      if ((dot(old_face_normal, n) <= 0 && dot(rotate_face_normal, new_face_normal) >= 0) 
+                      if ((dot(old_face_normal, n) <= 0 && dot(rotate_face_normal, new_face_normal) >= 0)
                         || (dot(old_face_normal, n) >= 0 && dot(rotate_face_normal, new_face_normal) <= 0)) {
                         possibleVertices.push_back(vk_struct);
                         for (Vector3D center: get_centers(vi->position, vj->position, vk->position, r)) {
@@ -361,14 +361,13 @@ namespace CGL
         }
         // Get the first center along the trajectory of the rotation
         double minTheta = 2.0 * M_PI;
-        vector<int> indices;
+        int indexV = 0, indexC = 0;
         Vector3D e_cm = center - mid;
         for (int i = 0; i < possibleVertices.size(); i++) {
           for (int j = 0; j < 2; j++) {
             double theta;
             Vector3D new_center = possibleCenters[2 * i + j];
             VertexIter possible_vk = possibleVertices[i]->v;
-            cout << possible_vk->position << " ";
             Vector3D old_e_ac = vi->position - last_vk->position;
             Vector3D old_e_bc = vj->position - last_vk->position;
             Vector3D old_n = cross(old_e_ac, old_e_bc);
@@ -379,43 +378,33 @@ namespace CGL
             if (theta > delta && dot(cross(e_cm, e_nm), cross(e_cm, old_p0 - mid)) > 0) {
               theta = 2 * M_PI - theta;
             }
-            if (theta < minTheta) {
-              indices.clear();
+            if (theta <= minTheta) {
               minTheta = theta;
-              indices.push_back(i);
-              indices.push_back(j);
-            } else if (theta == minTheta) {
-              minTheta = theta;
-              indices.push_back(i);
-              indices.push_back(j);
+              indexV = i;
+              indexC = j;
             }
           }
         }
 
-        for (int k = 0; k < indices.size()/2; k++) {
-          int indexV = indices[2*k];
-          int indexC = indices[2*k + 1];
-          VertexIter vk = possibleVertices[indexV]->v;
-          front.remove(e_ij_struct);
-          // Add elements to the mesh
-          if (!possibleVertices[indexV]->used) {
-            possibleVertices[indexV]->used = true;
-            join(mesh, front, vi, vj, vk, e_ij);
-            break;
-          } else {
-            for (edge_struct *e_struct: front) {
-              if (e_struct->v1 == vk || e_struct->v2 == vk) {
-                glue(mesh, front, vi, vj, vk, e_ij);
-                break;
-              }
+        VertexIter vk = possibleVertices[indexV]->v;
+        front.remove(e_ij_struct);
+        // Add elements to the mesh
+        if (!possibleVertices[indexV]->used) {
+          possibleVertices[indexV]->used = true;
+          join(mesh, front, vi, vj, vk, e_ij);
+        } else {
+          for (edge_struct *e_struct: front) {
+            if (e_struct->v1 == vk || e_struct->v2 == vk) {
+              glue(mesh, front, vi, vj, vk, e_ij);
+              break;
             }
           }
-          center = possibleCenters[2*indexV + indexC];
         }
         i += 1;
         if (i >= j) {
           return;
         }
+        center = possibleCenters[2*indexV + indexC];
       }
 
       center = find_seed_triangle(mesh, voxels, vertices, front, dimensions, r);
@@ -438,10 +427,10 @@ namespace CGL
     for (int v = 0; v < voxels.size(); v++) {
       bool vox_used = false;
       for (vertex_struct* v_struct: voxels[v]) {
-        if (v_struct->used) {
+        /*if (v_struct->used) {
           vox_used = true;
           break;
-        }
+        }*/
         if (!vox_used) {
           for (int k = 0; k < voxels[v].size(); k++) {
             vertex_struct* vk_struct = voxels[v][k];
