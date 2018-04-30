@@ -132,7 +132,22 @@ void loadPlyFile(const char * path, std::vector<Vector3D> &points) {
 
 int main( int argc, char** argv ) {
 
-  const char* path = argv[1];
+  const char* path;
+  const char* flag;
+  bool pointCloud = false;
+
+  if (argc == 2) {
+    path = argv[1];
+  }
+
+  if (argc == 3) {
+    flag = argv[1];
+    path = argv[2];
+    if (strcmp(flag, "-p") == 0) {
+      pointCloud = true;
+    }
+  }
+
   std::string path_str = path;
 
   //////////////////////////////
@@ -168,6 +183,8 @@ int main( int argc, char** argv ) {
   // create collada_viewer
   MeshEdit* collada_viewer = new MeshEdit();
 
+  collada_viewer->pointCloud = pointCloud;
+
   // set collada_viewer as renderer
   viewer.set_renderer(collada_viewer);
 
@@ -175,8 +192,10 @@ int main( int argc, char** argv ) {
   viewer.init();
 
   // load tests
-  if( argc == 2 ) {
+  if( (argc == 2) && (!pointCloud) ) {
     if (loadFile(collada_viewer, argv[1]) < 0) exit(0);
+  } else if( (argc == 3) && (pointCloud) ) {
+    if (loadFile(collada_viewer, argv[2]) < 0) exit(0);
   } else {
     msg("Usage: ./meshedit <path to scene file>"); exit(0);
   }

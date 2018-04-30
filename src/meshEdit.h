@@ -238,6 +238,7 @@ class MeshEdit : public Renderer {
   ~MeshEdit() { }
 
   bool pointCloudMode;
+  bool pointCloud;
 
   virtual void init();
   virtual void render();
@@ -320,6 +321,7 @@ class MeshEdit : public Renderer {
   void drawFaces    ( HalfedgeMesh& mesh );
   void drawEdges    ( HalfedgeMesh& mesh );
   void drawVertices ( HalfedgeMesh& mesh );
+  void drawPoints   ( HalfedgeMesh& mesh );
   void drawHalfedges( HalfedgeMesh& mesh );
   void drawHalfedgeArrow( Halfedge* h );
 
