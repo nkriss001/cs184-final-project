@@ -307,7 +307,7 @@ namespace CGL
     Vector3D center;
     // The main ball-pivot algorithm
     int i = 0;
-    int j = 11;
+    int j = 10000;
     while (true) {
       while (!front.empty()) {
         // Get the vertices of the first edge on the front
@@ -354,12 +354,13 @@ namespace CGL
           }
         }
 
+        front.remove(e_ij_struct);
         if (possibleVertices.size() == 0) {
-          break;
+          continue;
         }
         // Get the first center along the trajectory of the rotation
         double minTheta = 2.0 * M_PI;
-        int indexV = 0, indexC = 0;
+        int indexV = -1, indexC = -1;
         Vector3D e_cm = center - mid;
         for (int i = 0; i < possibleVertices.size(); i++) {
           for (int j = 0; j < 2; j++) {
@@ -384,17 +385,18 @@ namespace CGL
           }
         }
 
-        VertexIter vk = possibleVertices[indexV]->v;
-        front.remove(e_ij_struct);
-        // Add elements to the mesh
-        if (!possibleVertices[indexV]->used) {
-          possibleVertices[indexV]->used = true;
-          join(mesh, front, vi, vj, vk, e_ij);
-        } else {
-          for (edge_struct *e_struct: front) {
-            if (e_struct->v1 == vk || e_struct->v2 == vk) {
-              glue(mesh, front, vi, vj, vk, e_ij);
-              break;
+        if (indexV != -1) {
+          VertexIter vk = possibleVertices[indexV]->v;
+          // Add elements to the mesh
+          if (!possibleVertices[indexV]->used) {
+            possibleVertices[indexV]->used = true;
+            join(mesh, front, vi, vj, vk, e_ij);
+          } else {
+            for (edge_struct *e_struct: front) {
+              if (e_struct->v1 == vk || e_struct->v2 == vk) {
+                glue(mesh, front, vi, vj, vk, e_ij);
+                break;
+              }
             }
           }
         }
@@ -425,10 +427,10 @@ namespace CGL
       bool vox_used = false;
       vector<vertex_struct *> vox = voxels[v];
       for (vertex_struct* v_struct: vox) {
-        if (v_struct->used) {
+        /*if (v_struct->used) {
           vox_used = true;
           break;
-        }
+        }*/
         if (!vox_used) {
           for (int k = 0; k < vox.size(); k++) {
             vertex_struct* vk_struct = vox[k];
