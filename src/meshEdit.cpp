@@ -253,17 +253,10 @@ namespace CGL {
           case ' ':
           reset_camera();
           break;
-
           case 'u':
           case 'U':
           mesh_up_sample();
           break;
-
-          case 'p':
-          case 'P':
-          cloud_ball_pivot();
-          break;
-
           case 'i':
           case 'I':
           showHUD = !showHUD;
@@ -291,6 +284,11 @@ namespace CGL {
           case 'q':
           case 'Q':
           smoothShading = !smoothShading;
+          break;
+          case 'p':
+          case 'P':
+          cloud_ball_pivot();
+          pointCloud = false;
           break;
           // case 'p':
           // case 'P':
