@@ -256,10 +256,10 @@ namespace CGL
     return v5;
   }
 
-  int MeshResampler::hash_position(Vector3D pos, double r, int grid_width, int grid_height) {
-    // Hash a 3D position into a unique float identifier that represents
+  int MeshResampler::hash_position(Vector3D pos, double r, int grid_width, int grid_height, Vector3D minDimensions) {
+    // Hash a 3D position into a unique int identifier that represents
     // membership in some uniquely identified 3D box volume.
-    Vector3D box((pos.x - fmod(pos.x, 2*r)) / 2*r, (pos.y - fmod(pos.y, 2*r)) / 2*r, (pos.z - fmod(pos.z, 2*r)) / 2*r);
+    Vector3D box = Vector3D((pos.x - fmod(pos.x, 2*r)) / 2*r, (pos.y - fmod(pos.y, 2*r)) / 2*r, (pos.z - fmod(pos.z, 2*r)) / 2*r) - minDimensions;
     return floor(box.x + box.y * grid_width + box.z * grid_width * grid_height);
   }
 
@@ -283,7 +283,6 @@ namespace CGL
         minDimensions[i] = min(v->position[i], minDimensions[i]);
       }
     }
-
     Vector3D dimensions = maxDimensions - minDimensions + Vector3D(2*r, 2*r, 2*r);
     for (int i = 0; i < 3; i++) {
       dimensions[i] = ceil(dimensions[i]/(2*r));
@@ -292,7 +291,7 @@ namespace CGL
     // Create the voxel grid
     vector<vector <vertex_struct *> > voxels(dimensions[0] * dimensions[1] * dimensions[2]);
     for (vertex_struct *v_struct : vertices) {
-      int cell = hash_position(v_struct->v->position, r, dimensions[0], dimensions[1]);
+      int cell = hash_position(v_struct->v->position, r, dimensions[0], dimensions[1], minDimensions);
       voxels[cell].push_back(v_struct);
     }
 
@@ -306,10 +305,9 @@ namespace CGL
     // Initialize the front
     list<edge_struct *> front;
     Vector3D center;
-
     // The main ball-pivot algorithm
     int i = 0;
-    int j = 10000;
+    int j = 11;
     while (true) {
       while (!front.empty()) {
         // Get the vertices of the first edge on the front
@@ -326,7 +324,7 @@ namespace CGL
         // and the centers of those balls
         vector<Vector3D> possibleCenters;
         vector<vertex_struct *> possibleVertices;
-        int voxelNumber = hash_position(mid, r, dimensions[0], dimensions[1]);
+        int voxelNumber = hash_position(mid, r, dimensions[0], dimensions[1], minDimensions);
         for (int x = -1; x < 2; x++) {
           for (int y = -1; y < 2; y++) {
             for (int z = -1; z < 2; z++) {
@@ -407,7 +405,7 @@ namespace CGL
         center = possibleCenters[2*indexV + indexC];
       }
 
-      center = find_seed_triangle(mesh, voxels, vertices, front, dimensions, r);
+      center = find_seed_triangle(mesh, voxels, vertices, front, dimensions, minDimensions, r);
       i += 1;
       if (i >= j) {
         return;
@@ -419,24 +417,24 @@ namespace CGL
   }
 
   Vector3D MeshResampler::find_seed_triangle(HalfedgeMesh& mesh, vector<vector <vertex_struct *> >& voxels, vector<vertex_struct *> vertices, 
-    list<edge_struct *>& front, Vector3D dimensions, double r) {
+    list<edge_struct *>& front, Vector3D dimensions, Vector3D minDimensions, double r) {
     // Given a list of unused vertices, finds two more vertices such that a sphere
     // of radius r touches all three vertices and contains no other vertices
-    // TODO: Speed up with voxels
     vector<VertexIter> seed;
     for (int v = 0; v < voxels.size(); v++) {
       bool vox_used = false;
-      for (vertex_struct* v_struct: voxels[v]) {
-        /*if (v_struct->used) {
+      vector<vertex_struct *> vox = voxels[v];
+      for (vertex_struct* v_struct: vox) {
+        if (v_struct->used) {
           vox_used = true;
           break;
-        }*/
+        }
         if (!vox_used) {
-          for (int k = 0; k < voxels[v].size(); k++) {
-            vertex_struct* vk_struct = voxels[v][k];
+          for (int k = 0; k < vox.size(); k++) {
+            vertex_struct* vk_struct = vox[k];
             VertexIter vk = vk_struct->v;
             vector<vertex_struct *> possibleVertices;
-            int voxelNumber = hash_position(vk->position, r, dimensions[0], dimensions[1]);
+            int voxelNumber = hash_position(vk->position, r, dimensions[0], dimensions[1], minDimensions);
             if (!vk_struct->used) {
               vk_struct->used = true;
               for (int x = -1; x < 2; x++) {
@@ -459,10 +457,10 @@ namespace CGL
                 for (int j = i + 1; j < possibleVertices.size(); j++) {
                   vertex_struct* vj_struct = possibleVertices[j];
                   VertexIter vj = vj_struct->v;
-                  if ((vj->position - vk->position).norm() <= 2*r && (vj->position - vi->position).norm() <= 2*r) {
-                    Vector3D pi = vi->position;
-                    Vector3D pj = vj->position;
-                    Vector3D pk = vk->position;
+                  Vector3D pi = vi->position;
+                  Vector3D pj = vj->position;
+                  Vector3D pk = vk->position;
+                  if ((pi - pj).norm() <= 2*r && (pi - pk).norm() <= 2*r && (pj - pk).norm() <= 2*r) {
                     Vector3D e_ik = pi - pk;
                     Vector3D e_jk = pj - pk;
                     Vector3D n = cross(e_ik, e_jk);
@@ -471,28 +469,32 @@ namespace CGL
                     if ((dot(n, vi->norm) <= 0 && dot(n, vj->norm) <= 0 && dot(n, vk->norm) <= 0)
                       || (dot(n, vi->norm) >= 0 && dot(n, vj->norm) >= 0 && dot(n, vk->norm) >= 0)) {
                       vector<Vector3D> centers = get_centers(pi, pj, pk, r);
+                      Vector3D c1 = centers[0];
+                      Vector3D c2 = centers[1];
+                      Vector3D p0 = (cross(dot(e_ik, e_jk) * e_jk - dot(e_jk, e_jk) * e_ik, n) / (2 * dot(n, n))) + pk;
                       // Check that the spheres touching the three points are valid, i.e. contain no other data point
-                      bool good1 = true;
-                      bool good2 = true;
+                      bool c1_bool = true;
+                      bool c2_bool = true;
                       for (vertex_struct *u_struct : possibleVertices) {
                         VertexIter u = u_struct->v;
-                        if ((u->position - centers[0]).norm() < r) {
-                          good1 = false;
+                        if ((u->position - c1).norm() <= r) {
+                          c1_bool = false;
                           continue;
                         }
-                        if ((u->position - centers[1]).norm() < r) {
-                          good2 = false;
+                        if ((u->position - c2).norm() <= r) {
+                          c2_bool = false;
                           continue;
                         }
                       }
-                      if (good1 || good2) {
-                        vk_struct->used = true;
-                        if (!vi_struct->used) {
-                          vi_struct->used = true;
-                        }
-                        if (!vj_struct->used) {
-                          vj_struct->used = true;
-                        }
+                      if (dot(c1 - p0, vi->norm) < 0 || dot(c1 - p0, vj->norm) < 0 || dot(c1 - p0, vk->norm) < 0) {
+                        c1_bool = false;
+                      }
+                      if (dot(c2 - p0, vi->norm) < 0 || dot(c2 - p0, vj->norm) < 0 || dot(c2 - p0, vk->norm) < 0) {
+                        c2_bool = false;
+                      }
+                      if (c1_bool || c2_bool) {
+                        vi_struct->used = true;
+                        vj_struct->used = true;
 
                         HalfedgeIter h_ij = mesh.newHalfedge();
                         HalfedgeIter h_ik = mesh.newHalfedge();
@@ -553,11 +555,11 @@ namespace CGL
                         front.push_front(e_ij_struct);
                         front.push_front(e_jk_struct);
                         front.push_front(e_ik_struct);
-                      }
-                      if (good1) {
-                        return centers[0];
-                      } else if (good2) {
-                        return centers[1];
+                        if (c1_bool) {
+                          return c1;
+                        } else if (c2_bool) {
+                          return c2;
+                        }
                       }
                     }
                   }
