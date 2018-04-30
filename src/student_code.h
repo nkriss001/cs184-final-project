@@ -39,7 +39,7 @@ namespace CGL {
     };
 
     void upsample(HalfedgeMesh& mesh);
-    void ballPivot(HalfedgeMesh& mesh);
+    void ballPivot(HalfedgeMesh& mesh, double BPAr);
     int hash_position(Vector3D pos, double r, int grid_width, int grid_height);
     vector<Vector3D> get_centers(Vector3D p1, Vector3D p2, Vector3D p3, double r);
     void join(HalfedgeMesh& mesh, list<edge_struct *>& front, VertexIter vi, VertexIter vj, 

@@ -239,6 +239,7 @@ class MeshEdit : public Renderer {
 
   bool pointCloudMode;
   bool pointCloud;
+  double BPAr;
 
   virtual void init();
   virtual void render();

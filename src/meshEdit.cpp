@@ -1037,7 +1037,7 @@ namespace CGL {
                     // If an element is selected, resample the mesh containing that
                     // element; otherwise, resample the first mesh in the scene.
                     mesh = &( meshNodes.begin()->mesh );
-                    resampler.ballPivot( *mesh );
+                    resampler.ballPivot( *mesh, BPAr );
 
                     // Since the mesh may have changed, the selected and
                     // hovered features may no longer point to valid elements.
