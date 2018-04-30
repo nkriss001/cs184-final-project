@@ -263,9 +263,9 @@ namespace CGL
     return floor(box.x + box.y * grid_width + box.z * grid_width * grid_height);
   }
 
-  void MeshResampler::ballPivot(HalfedgeMesh& mesh) {
+  void MeshResampler::ballPivot(HalfedgeMesh& mesh, double BPAr) {
     // The radius of the ball we will pivot
-    double r = 2.0;
+    double r = BPAr;
     double delta = 0.00001;
 
     // A vertex of all vertices in the point cloud
