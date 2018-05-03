@@ -256,43 +256,39 @@ namespace CGL
     return v5;
   }
 
-  int MeshResampler::hash_position(Vector3D pos, double r, int grid_width, int grid_height, Vector3D minDimensions) {
+  int MeshResampler::hash_position(Vector3D pos, double r, Vector3D dimensions, Vector3D minDimensions) {
     // Hash a 3D position into a unique int identifier that represents
     // membership in some uniquely identified 3D box volume.
-    Vector3D box = Vector3D((pos.x - fmod(pos.x, 2*r)) / 2*r, (pos.y - fmod(pos.y, 2*r)) / 2*r, (pos.z - fmod(pos.z, 2*r)) / 2*r) - minDimensions;
-    return floor(box.x + box.y * grid_width + box.z * grid_width * grid_height);
+    pos = pos - minDimensions;
+    Vector3D box = Vector3D((pos.x - fmod(pos.x, 2*r)) / (2.0 * r), (pos.y - fmod(pos.y, 2*r)) / (2.0 * r), (pos.z - fmod(pos.z, 2.0 * r)) / (2.0 * r));
+    return floor(box.x + box.y * dimensions[0] + box.z * dimensions[0] * dimensions[1]);
   }
 
   void MeshResampler::ballPivot(HalfedgeMesh& mesh, double BPAr) {
-    // The radius of the ball we will pivot
-    double r = BPAr;
-    double delta = 0.00001;
+    double r = BPAr; // The radius of the ball we will pivot
+    double delta = pow(10, -6); // An error for calculating the angle
+    vector<vertex_struct *> vertices; // A vector of vertices in the point cloud
 
-    // A vertex of all vertices in the point cloud
-    vector<vertex_struct *> vertices;
-
-    // Get the vertex normals and the dimensions of the voxel grid
     Vector3D maxDimensions(-INFINITY, -INFINITY, -INFINITY), minDimensions(INFINITY, INFINITY, INFINITY);
     for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
-      v->norm = v->normal();
-      vertex_struct *v_struct = new vertex_struct();
+      v->norm = v->normal(); // Set vertex normals so we don't need faces to calculate them
+      vertex_struct *v_struct = new vertex_struct(); // Instantiate a vertex struct for each vertex
       v_struct->v = v;
       vertices.push_back(v_struct);
-      for (int i = 0; i < 3; i++) {
+      for (int i = 0; i < 3; i++) { // Find the dimensions of the smallest box containing our entire point cloud
         maxDimensions[i] = max(v->position[i], maxDimensions[i]);
         minDimensions[i] = min(v->position[i], minDimensions[i]);
       }
     }
-    Vector3D dimensions = maxDimensions - minDimensions + Vector3D(2*r, 2*r, 2*r);
-    for (int i = 0; i < 3; i++) {
-      dimensions[i] = ceil(dimensions[i]/(2*r));
-    }
 
-    // Create the voxel grid
-    vector<vector <vertex_struct *> > voxels(dimensions[0] * dimensions[1] * dimensions[2]);
+    Vector3D dimensions = maxDimensions - minDimensions; // Get length of each dimension  
+    for (int i = 0; i < 3; i++) {
+      dimensions[i] = ceil(dimensions[i]/(2*r)) + 1; // Set dimensions to be the number of cells in each dimension
+    }
+    vector<vector <vertex_struct *> > voxels(dimensions[0] * dimensions[1] * dimensions[2]); // Initialize the voxel grid
     for (vertex_struct *v_struct : vertices) {
-      int cell = hash_position(v_struct->v->position, r, dimensions[0], dimensions[1], minDimensions);
-      voxels[cell].push_back(v_struct);
+      int cell = hash_position(v_struct->v->position, r, dimensions, minDimensions - Vector3D(2*r, 2*r, 2*r));
+      voxels[cell].push_back(v_struct); // Add vertices to correct voxels
     }
 
     // Delete all objects in the mesh
@@ -304,47 +300,62 @@ namespace CGL
 
     // Initialize the front
     list<edge_struct *> front;
-    Vector3D center;
     // The main ball-pivot algorithm
     int i = 0;
-    int j = 10000;
+    int j = 1000;
     while (true) {
       while (!front.empty()) {
-        // Get the vertices of the first edge on the front
+        // Get the vertices of the first edge on the front and its opposite vertex
+        // Since the edge is on the front, it must be connected to exactly one triangle
         edge_struct* e_ij_struct = front.front();
         EdgeIter e_ij = e_ij_struct->e;
         VertexIter vi = e_ij_struct->v1;
         VertexIter vj = e_ij_struct->v2;
         VertexIter last_vk = e_ij_struct->v3;
-        Vector3D mid = 0.5 * (vi->position + vj->position);
-        Vector3D n = cross(vi->position - last_vk->position, vj->position - last_vk->position);
+        // The positions of the vertices associated with this edge
+        Vector3D vi_pos = vi->position;
+        Vector3D vj_pos = vj->position;
+        Vector3D last_vk_pos = last_vk->position;
+        // The midpoint of the edge we will rotate around
+        Vector3D mid = 0.5 * (vi_pos + vj_pos);
+        // The normal of the triangle calculated from the cross product of vk -> vi and vk -> vj)
+        Vector3D n = cross(vi_pos - last_vk_pos, vj_pos - last_vk_pos);
+        // The "actual" face normal, calculated from the normals at the vertices
         Vector3D old_face_normal = (vi->norm + vj->norm + last_vk->norm)/3.0;
+        // The center of the sphere touching our three points wit hthe given normal
+        Vector3D center = get_center(vi_pos, vj_pos, last_vk_pos, r, old_face_normal);
 
-        // Get all points vk such that a ball of radius r touches vi, vj, and vk
-        // and the centers of those balls
-        vector<Vector3D> possibleCenters;
+        // Vertices that we might reach by rotating on the current edge
         vector<vertex_struct *> possibleVertices;
-        int voxelNumber = hash_position(mid, r, dimensions[0], dimensions[1], minDimensions);
+        // The center of each sphere touching vi, vj, and a possible vertex
+        vector<Vector3D> possibleCenters;
+        // The voxel containing the center of the trajectory, mid
+        int voxelNumber = hash_position(mid, r, dimensions, minDimensions - Vector3D(2*r, 2*r, 2*r));
         for (int x = -1; x < 2; x++) {
           for (int y = -1; y < 2; y++) {
             for (int z = -1; z < 2; z++) {
               int newVoxelNumber = voxelNumber + x + y * dimensions[0] + z * dimensions[0] * dimensions[1];
               if (newVoxelNumber >= 0 && newVoxelNumber < voxels.size()) {
                 for (vertex_struct *vk_struct : voxels[newVoxelNumber]) {
+                  // A potential vertex vk
                   VertexIter vk = vk_struct->v;
+                  Vector3D vk_pos = vk->position;
                   if (vk != vi && vk != vj && vk != last_vk) {
-                    Vector3D e_ik = vi->position - vk->position;
-                    Vector3D e_jk = vj->position - vk->position;
-                    double cosTheta = dot(e_ik, e_jk)/(e_ik.norm() * e_jk.norm());
-                    if (e_ik.norm() <= 2*r && e_jk.norm() <= 2*r && abs(cosTheta) != 1) {
-                      Vector3D rotate_face_normal = cross(vi->position - vk->position, vj->position - vk->position);
-                      Vector3D new_face_normal = (vi->norm + vj->norm + vk->norm)/3.0;
-                      if ((dot(old_face_normal, n) <= 0 && dot(rotate_face_normal, new_face_normal) >= 0)
-                        || (dot(old_face_normal, n) >= 0 && dot(rotate_face_normal, new_face_normal) <= 0)) {
+                    Vector3D e_ik = vi_pos - vk_pos;
+                    Vector3D e_jk = vj_pos - vk_pos;
+                    // The normal we would get if we rotated and resized the seed triangle
+                    Vector3D rotate_face_normal = cross(vi_pos - vk_pos, vj_pos - vk_pos);
+                    // The "actual" new face normal, calculated from the normals at the vertices
+                    Vector3D new_face_normal = (vi->norm + vj->norm + vk->norm)/3.0;
+                    // We need to make sure our new vertices will not create a non-orientable manifold.
+                    // If old_face_normal and n were in the same direction, we need rotate_face_normal and
+                    // new_face_normal to be in opposite directions, and vice versa
+                    if ((dot(old_face_normal, n) <= 0 && dot(rotate_face_normal, new_face_normal) >= 0)
+                      || (dot(old_face_normal, n) >= 0 && dot(rotate_face_normal, new_face_normal) <= 0)) {
+                      Vector3D center = get_center(vi_pos, vj_pos, vk_pos, r, new_face_normal);
+                      if (center[0] != INFINITY) {
                         possibleVertices.push_back(vk_struct);
-                        for (Vector3D center: get_centers(vi->position, vj->position, vk->position, r)) {
-                          possibleCenters.push_back(center);
-                        }
+                        possibleCenters.push_back(center);
                       }
                     }
                   }
@@ -354,216 +365,213 @@ namespace CGL
           }
         }
 
+        // The edge will either form a second and final triangle or be unable to form any triangles in the mesh,
+        // and so we can remove it from the front.
         front.remove(e_ij_struct);
+        // If vi and vj can only form a triangle with last_vk, we break the loop early and continue in the front.
         if (possibleVertices.size() == 0) {
           continue;
-        }
+        } 
+
         // Get the first center along the trajectory of the rotation
+        // For debugging purposes
+        int k = i;
+        // All rotations will be in the range [0, 2*M_PI)
         double minTheta = 2.0 * M_PI;
-        int indexV = -1, indexC = -1;
+        // The indices of the first center on the trajectory and its corresponding vk
+        int index = -1;
+        // A vector pointing from mid, the center of the trajectory, to center, which is on the trajectory
         Vector3D e_cm = center - mid;
+        // Calculations to find the circumcenter of the circle touching vi, vj, and last_vk
+        Vector3D old_e_ac = vi_pos - last_vk_pos;
+        Vector3D old_e_bc = vj_pos - last_vk_pos;
+        Vector3D old_n = cross(old_e_ac, old_e_bc);
+        Vector3D old_p0 = (cross(dot(old_e_ac, old_e_ac) * old_e_bc - dot(old_e_bc, old_e_bc) * old_e_ac, old_n) / (2 * dot(old_n, old_n))) + last_vk->position;
         for (int i = 0; i < possibleVertices.size(); i++) {
-          for (int j = 0; j < 2; j++) {
-            double theta;
-            Vector3D new_center = possibleCenters[2 * i + j];
-            VertexIter possible_vk = possibleVertices[i]->v;
-            Vector3D old_e_ac = vi->position - last_vk->position;
-            Vector3D old_e_bc = vj->position - last_vk->position;
-            Vector3D old_n = cross(old_e_ac, old_e_bc);
-            Vector3D old_p0 = (cross(dot(old_e_ac, old_e_ac) * old_e_bc - dot(old_e_bc, old_e_bc) * old_e_ac, old_n) / (2 * dot(old_n, old_n))) + last_vk->position;
+          double theta;
+          // The center we are testing, and its corresponding vertex
+          Vector3D possible_center = possibleCenters[i];
+          VertexIter possible_vk = possibleVertices[i]->v;
 
-            Vector3D e_nm = new_center - mid;
-            theta = acos(dot(e_cm, e_nm)/(e_cm.norm() * e_nm.norm()));
-            if (theta > delta && dot(cross(e_cm, e_nm), cross(e_cm, old_p0 - mid)) > 0) {
-              theta = 2 * M_PI - theta;
-            }
-            if (theta <= minTheta) {
-              minTheta = theta;
-              indexV = i;
-              indexC = j;
-            }
+          // A vector pointing from mid, the center of the trajectory, to possible_center, which is on the trajectory
+          Vector3D e_nm = possible_center - mid;
+          // The angle between e_cm and e_nm
+          theta = acos(dot(e_cm, e_nm)/(e_cm.norm() * e_nm.norm()));
+          // We use delta to account for math errors.
+          if (theta > delta && ((dot(last_vk_pos - mid, old_p0 - mid) >= 0 && dot(cross(e_cm, e_nm), cross(e_cm, old_p0 - mid)) >= 0)
+            || (dot(last_vk_pos - mid, old_p0 - mid) <= 0 && dot(cross(e_cm, e_nm), cross(e_cm, old_p0 - mid)) <= 0))) {
+            theta = 2 * M_PI - theta;
+          }
+          if (theta <= minTheta) {
+            minTheta = theta;
+            index = i;
           }
         }
 
-        if (indexV != -1) {
-          VertexIter vk = possibleVertices[indexV]->v;
-          // Add elements to the mesh
-          if (!possibleVertices[indexV]->used) {
-            possibleVertices[indexV]->used = true;
-            join(mesh, front, vi, vj, vk, e_ij);
-          } else {
-            for (edge_struct *e_struct: front) {
-              if (e_struct->v1 == vk || e_struct->v2 == vk) {
-                glue(mesh, front, vi, vj, vk, e_ij);
-                break;
-              }
-            }
+        vertex_struct *vk_struct = possibleVertices[index];
+        VertexIter vk = vk_struct->v;
+        Vector3D possibleCenter = possibleCenters[index];
+        if (!vk_struct->used) { // If vk is not already par of the mesh
+          vk_struct->used = true;
+          join(mesh, front, vi, vj, vk, e_ij);
+        } else {
+          for (edge_struct *e_struct: front) {
+            if (e_struct->v1 == vk || e_struct->v2 == vk) { // If vk is connected to some edge on the front
+              glue(mesh, front, vi, vj, vk, e_ij);
+              break;
+            }            
           }
         }
-        i += 1;
+        /*i += 1;
         if (i >= j) {
           return;
-        }
-        center = possibleCenters[2*indexV + indexC];
+        }*/
       }
 
-      center = find_seed_triangle(mesh, voxels, vertices, front, dimensions, minDimensions, r);
+      bool found_seed = find_seed_triangle(mesh, voxels, vertices, front, dimensions, minDimensions, r);
       i += 1;
-      if (i >= j) {
+      /*if (i >= j) {
         return;
-      }
-      if (center.x == INFINITY) {
-        return;
+      }*/
+      if (!found_seed) {
+        break;
       }
     }
+    return;
   }
 
-  Vector3D MeshResampler::find_seed_triangle(HalfedgeMesh& mesh, vector<vector <vertex_struct *> >& voxels, vector<vertex_struct *> vertices, 
+  bool MeshResampler::find_seed_triangle(HalfedgeMesh& mesh, vector<vector <vertex_struct *> >& voxels, vector<vertex_struct *> vertices, 
     list<edge_struct *>& front, Vector3D dimensions, Vector3D minDimensions, double r) {
     // Given a list of unused vertices, finds two more vertices such that a sphere
     // of radius r touches all three vertices and contains no other vertices
-    vector<VertexIter> seed;
-    for (int v = 0; v < voxels.size(); v++) {
-      bool vox_used = false;
+    for (int v = 0; v < voxels.size(); v++) { // Iterate through every voxel
       vector<vertex_struct *> vox = voxels[v];
-      for (vertex_struct* v_struct: vox) {
-        /*if (v_struct->used) {
+      bool vox_used = false;
+      for (vertex_struct* v: vox) { // See if any point in the voxel has been used
+        if (v->used) {
           vox_used = true;
           break;
-        }*/
-        if (!vox_used) {
-          for (int k = 0; k < vox.size(); k++) {
-            vertex_struct* vk_struct = vox[k];
-            VertexIter vk = vk_struct->v;
-            vector<vertex_struct *> possibleVertices;
-            int voxelNumber = hash_position(vk->position, r, dimensions[0], dimensions[1], minDimensions);
-            if (!vk_struct->used) {
-              vk_struct->used = true;
-              for (int x = -1; x < 2; x++) {
-                for (int y = -1; y < 2; y++) {
-                  for (int z = -1; z < 2; z++) {
-                    int newVoxelNumber = voxelNumber + x + y * dimensions[0] + z * dimensions[0] * dimensions[1];
-                    if (newVoxelNumber >= 0 && newVoxelNumber < voxels.size()) {
-                      for (vertex_struct *v_struct : voxels[newVoxelNumber]) {
-                        if (v_struct->v != vk) {
-                          possibleVertices.push_back(v_struct);
-                        }
-                      }
+        }
+      }
+      if (!vox_used) { // If no vertex in this voxel has been used, we look for a seed triange
+        for (int k = 0; k < vox.size(); k++) { // We look at every vertex in the voxel
+          vertex_struct* vk_struct = vox[k];
+          VertexIter vk = vk_struct->v; // A point that is not yet part of the mesh
+          vk_struct->used = true;
+          vector<vertex_struct *> possibleVertices; // Vertices within 2r of our seed vertex vk
+          for (int x = -1; x < 2; x++) { // We look at the surrounding voxels for potential seed points
+            for (int y = -1; y < 2; y++) {
+              for (int z = -1; z < 2; z++) {
+                int newVoxelNumber = v + x + y * dimensions[0] + z * dimensions[0] * dimensions[1];
+                if (newVoxelNumber >= 0 && newVoxelNumber < voxels.size()) {
+                  for (vertex_struct *v_struct : voxels[newVoxelNumber]) {
+                    if (v_struct->v != vk && (v_struct->v->position - vk->position).norm() <= 2.0 * r) {
+                      possibleVertices.push_back(v_struct);
                     }
                   }
                 }
               }
-              for (int i = 0; i < possibleVertices.size(); i++) {
-                vertex_struct* vi_struct = possibleVertices[i];
-                VertexIter vi = vi_struct->v;
-                for (int j = i + 1; j < possibleVertices.size(); j++) {
-                  vertex_struct* vj_struct = possibleVertices[j];
-                  VertexIter vj = vj_struct->v;
-                  Vector3D pi = vi->position;
-                  Vector3D pj = vj->position;
-                  Vector3D pk = vk->position;
-                  if ((pi - pj).norm() <= 2*r && (pi - pk).norm() <= 2*r && (pj - pk).norm() <= 2*r) {
-                    Vector3D e_ik = pi - pk;
-                    Vector3D e_jk = pj - pk;
-                    Vector3D n = cross(e_ik, e_jk);
-                    // Check that the normals of the three vertices are consistent with the normal of the 
-                    // triangle they form
-                    if ((dot(n, vi->norm) <= 0 && dot(n, vj->norm) <= 0 && dot(n, vk->norm) <= 0)
-                      || (dot(n, vi->norm) >= 0 && dot(n, vj->norm) >= 0 && dot(n, vk->norm) >= 0)) {
-                      vector<Vector3D> centers = get_centers(pi, pj, pk, r);
-                      Vector3D c1 = centers[0];
-                      Vector3D c2 = centers[1];
-                      Vector3D p0 = (cross(dot(e_ik, e_jk) * e_jk - dot(e_jk, e_jk) * e_ik, n) / (2 * dot(n, n))) + pk;
-                      // Check that the spheres touching the three points are valid, i.e. contain no other data point
-                      bool c1_bool = true;
-                      bool c2_bool = true;
-                      for (vertex_struct *u_struct : possibleVertices) {
-                        VertexIter u = u_struct->v;
-                        if ((u->position - c1).norm() <= r) {
-                          c1_bool = false;
-                          continue;
-                        }
-                        if ((u->position - c2).norm() <= r) {
-                          c2_bool = false;
-                          continue;
-                        }
-                      }
-                      if (dot(c1 - p0, vi->norm) < 0 || dot(c1 - p0, vj->norm) < 0 || dot(c1 - p0, vk->norm) < 0) {
-                        c1_bool = false;
-                      }
-                      if (dot(c2 - p0, vi->norm) < 0 || dot(c2 - p0, vj->norm) < 0 || dot(c2 - p0, vk->norm) < 0) {
-                        c2_bool = false;
-                      }
-                      if (c1_bool || c2_bool) {
-                        vi_struct->used = true;
-                        vj_struct->used = true;
-
-                        HalfedgeIter h_ij = mesh.newHalfedge();
-                        HalfedgeIter h_ik = mesh.newHalfedge();
-                        HalfedgeIter h_jk = mesh.newHalfedge();
-                        EdgeIter e_ij = mesh.newEdge();
-                        EdgeIter e_ik = mesh.newEdge();
-                        EdgeIter e_jk = mesh.newEdge();
-                        FaceIter f_ijk = mesh.newFace();
-
-                        vk->halfedge() = h_ik;
-                        vi->halfedge() = h_ij;
-                        vj->halfedge() = h_jk;
-
-                        h_ij->edge() = e_ij;
-                        h_ik->edge() = e_ik;
-                        h_jk->edge() = e_jk;
-
-                        h_ij->twin() = h_ij;
-                        h_ik->twin() = h_ik;
-                        h_jk->twin() = h_jk;
-
-                        h_ij->face() = f_ijk;
-                        h_ik->face() = f_ijk;
-                        h_jk->face() = f_ijk;
-                          
-                        h_ij->next() = h_ik;
-                        h_ij->vertex() = vj;
-
-                        h_ik->next() = h_jk;
-                        h_ik->vertex() = vi;
-
-                        h_jk->next() = h_ij;
-                        h_jk->vertex() = vk;
-
-                        e_ij->halfedge() = h_ij;
-                        e_ik->halfedge() = h_ik;
-                        e_jk->halfedge() = h_jk;
-                        f_ijk->halfedge() = h_ij;
-
-                        edge_struct *e_ij_struct = new edge_struct();
-                        e_ij_struct->e = e_ij;
-                        e_ij_struct->v1 = vi;
-                        e_ij_struct->v2 = vj;
-                        e_ij_struct->v3 = vk;
-
-                        edge_struct *e_ik_struct = new edge_struct();
-                        e_ik_struct->e = e_ik;
-                        e_ik_struct->v1 = vi;
-                        e_ik_struct->v2 = vk;
-                        e_ik_struct->v3 = vj;
-
-                        edge_struct *e_jk_struct = new edge_struct();
-                        e_jk_struct->e = e_jk;
-                        e_jk_struct->v1 = vj;
-                        e_jk_struct->v2 = vk;
-                        e_jk_struct->v3 = vi;
-
-                        front.push_front(e_ij_struct);
-                        front.push_front(e_jk_struct);
-                        front.push_front(e_ik_struct);
-                        if (c1_bool) {
-                          return c1;
-                        } else if (c2_bool) {
-                          return c2;
-                        }
-                      }
+            }
+          }
+          for (int i = 0; i < possibleVertices.size(); i++) { // Potential vi's
+            vertex_struct* vi_struct = possibleVertices[i];
+            VertexIter vi = vi_struct->v;
+            for (int j = i + 1; j < possibleVertices.size(); j++) { // Potential vj's
+              vertex_struct* vj_struct = possibleVertices[j];
+              VertexIter vj = vj_struct->v;
+              // The positions of our potential seed vertices
+              Vector3D pi = vi->position;
+              Vector3D pj = vj->position;
+              Vector3D pk = vk->position;
+              if ((pi - pj).norm() <= 2.0 * r) { // If all vertices are within 2r of each other
+                Vector3D e_ik = pi - pk;
+                Vector3D e_jk = pj - pk;
+                Vector3D n = (vi->norm + vj->norm + vk->norm)/3.0;
+                // Check that the normals of the three vertices are consistent
+                if ((dot(n, vi->norm) <= 0 && dot(n, vj->norm) <= 0 && dot(n, vk->norm) <= 0)
+                  || (dot(n, vi->norm) >= 0 && dot(n, vj->norm) >= 0 && dot(n, vk->norm) >= 0)) {
+                  // Ge the sphere on top of the triangle, assuming it is valid
+                  Vector3D center = get_center(pi, pj, pk, r, n);
+                  if (center[0] == INFINITY) {
+                    continue;
+                  }
+                  // Check that the sphere does not contain any other data point
+                  bool c_bool = true;
+                  for (vertex_struct *u_struct : possibleVertices) {
+                    VertexIter u = u_struct->v;
+                    if (u != vi && u != vj && (u->position - center).norm() < r) {
+                      c_bool = false;
+                      break;
                     }
+                  }
+                  // If the sphere touches vi, vj and vk and contains no other data point, (vi, vj, vk) is a valid seed triangle
+                  if (c_bool) {
+                    // Set all vertices to used
+                    vi_struct->used = true;
+                    vj_struct->used = true;
+
+                    // Add elements to the mesh
+                    HalfedgeIter h_ij = mesh.newHalfedge();
+                    HalfedgeIter h_ik = mesh.newHalfedge();
+                    HalfedgeIter h_jk = mesh.newHalfedge();
+                    EdgeIter e_ij = mesh.newEdge();
+                    EdgeIter e_ik = mesh.newEdge();
+                    EdgeIter e_jk = mesh.newEdge();
+                    FaceIter f_ijk = mesh.newFace();
+
+                    vi->halfedge() = h_ij;
+                    vj->halfedge() = h_jk;
+                    vk->halfedge() = h_ik;
+
+                    h_ij->edge() = e_ij;
+                    h_ik->edge() = e_ik;
+                    h_jk->edge() = e_jk;
+
+                    h_ij->twin() = h_ij;
+                    h_ik->twin() = h_ik;
+                    h_jk->twin() = h_jk;
+
+                    h_ij->face() = f_ijk;
+                    h_ik->face() = f_ijk;
+                    h_jk->face() = f_ijk;
+                          
+                    h_ij->next() = h_ik;
+                    h_ij->vertex() = vj;
+
+                    h_ik->next() = h_jk;
+                    h_ik->vertex() = vi;
+
+                    h_jk->next() = h_ij;
+                    h_jk->vertex() = vk;
+
+                    e_ij->halfedge() = h_ij;
+                    e_ik->halfedge() = h_ik;
+                    e_jk->halfedge() = h_jk;
+                    f_ijk->halfedge() = h_ij;
+
+                    edge_struct *e_ij_struct = new edge_struct();
+                    e_ij_struct->e = e_ij;
+                    e_ij_struct->v1 = vi;
+                    e_ij_struct->v2 = vj;
+                    e_ij_struct->v3 = vk;
+
+                    edge_struct *e_ik_struct = new edge_struct();
+                    e_ik_struct->e = e_ik;
+                    e_ik_struct->v1 = vi;
+                    e_ik_struct->v2 = vk;
+                    e_ik_struct->v3 = vj;
+
+                    edge_struct *e_jk_struct = new edge_struct();
+                    e_jk_struct->e = e_jk;
+                    e_jk_struct->v1 = vj;
+                    e_jk_struct->v2 = vk;
+                    e_jk_struct->v3 = vi;
+
+                    front.push_front(e_ij_struct);
+                    front.push_front(e_jk_struct);
+                    front.push_front(e_ik_struct);
+                    // Return that we could find a seed triangle
+                    return true;
                   }
                 }
               }
@@ -572,31 +580,39 @@ namespace CGL
         }
       }
     }
-    return Vector3D(INFINITY, INFINITY, INFINITY);
+    // Return that we could not find a seed triangle
+    return false;
   }
 
-  vector<Vector3D> MeshResampler::get_centers(Vector3D a, Vector3D b, Vector3D c, double r) {
+  Vector3D MeshResampler::get_center(Vector3D a, Vector3D b, Vector3D c, double r, Vector3D norm) {
     // https://en.wikipedia.org/wiki/Circumscribed_circle
-    // Returns the possible centers of a sphere of radius r that touches the three given points
-    vector<Vector3D> centers;
+    // Returns the center of a sphere of radius r that touches the three given points and is in the direction of n
     Vector3D e_ac = a - c;
     Vector3D e_bc = b - c;
-    Vector3D n = cross(e_ac, e_bc);
-    Vector3D p0 = (cross(dot(e_ac, e_ac) * e_bc - dot(e_bc, e_bc) * e_ac, n) / (2 * dot(n, n))) + c;
-    double r0 = (e_ac.norm() * e_bc.norm() * (e_ac - e_bc).norm())/(2*n.norm());
+    // A unit vector perpendicular to the plane of the triangle
+    Vector3D c_norm = cross(e_ac, e_bc);
+    // The circumcenter of the circle touching all three points
+    Vector3D p0 = (cross(dot(e_ac, e_ac) * e_bc - dot(e_bc, e_bc) * e_ac, c_norm) / (2.0 * dot(c_norm, c_norm))) + c;
+    // The radius of the circumscribed circle
+    double r0 = (e_ac.norm() * e_bc.norm() * (e_ac - e_bc).norm())/(2.0 * c_norm.norm());
+    // Check that we can actually form a sphere of radius r
+    if (c_norm.norm() == 0 || r < r0) {
+      return Vector3D(INFINITY, INFINITY, INFINITY);
+    }
     double h = sqrt(r*r - r0*r0);
-    Vector3D c1 = p0 + n * h/n.norm();
-    Vector3D c2 = p0 - n * h/n.norm();
-    centers.push_back(c1);
-    centers.push_back(c2);
-    return centers;
+    Vector3D c1 = p0 + c_norm * h/c_norm.norm();
+    Vector3D c2 = p0 - c_norm * h/c_norm.norm();
+    if (dot(c1 - p0, norm) >= 0) {
+      return c1;
+    } else {
+      return c2;
+    }
   }
 
   void MeshResampler::join(HalfedgeMesh& mesh, list<edge_struct *>& front, VertexIter vi, VertexIter vj, 
     VertexIter vk, EdgeIter e_ij) {
-    // Edge e has vertices vi and vj, and we want to add triangle (vi, vk, vj) to the mesh
-    // and add edges (vi, vk) and (vk, vj) and remove edge (vi, vj) from the front. We return the
-    // newly added edges for use in other functions.
+    // Edge e_ij has vertices vi and vj, and we want to add triangle (vi, vk, vj) and
+    // edges (vi, vk) and (vk, vj) to the mesh.
     HalfedgeIter h_ij = mesh.newHalfedge();
     HalfedgeIter h_ik = mesh.newHalfedge();
     HalfedgeIter h_jk = mesh.newHalfedge();
@@ -646,12 +662,13 @@ namespace CGL
     f_ijk->halfedge() = h_ij;
 
     edge_struct *e_ik_struct = new edge_struct;
-    edge_struct *e_jk_struct = new edge_struct;
     e_ik_struct->e = e_ik;
-    e_jk_struct->e = e_jk;
     e_ik_struct->v1 = vi;
     e_ik_struct->v2 = vk;
     e_ik_struct->v3 = vj;
+
+    edge_struct *e_jk_struct = new edge_struct;
+    e_jk_struct->e = e_jk;
     e_jk_struct->v1 = vj;
     e_jk_struct->v2 = vk;
     e_jk_struct->v3 = vi;
@@ -662,17 +679,24 @@ namespace CGL
 
   void MeshResampler::glue(HalfedgeMesh& mesh, list<edge_struct *>& front, VertexIter vi, VertexIter vj, 
     VertexIter vk, EdgeIter e_ij) {
+    // Edge e_ij has vertices vi and vj, and we want to add triangle (vi, vk, vj) and
+    // potentially edges (vi, vk) and (vk, vj) to the mesh.
     bool e_ik_bool = false;
     bool e_jk_bool = false;
+
     edge_struct *e_ik_struct = new edge_struct();
     e_ik_struct->v1 = vi;
     e_ik_struct->v2 = vk;
     e_ik_struct->v3 = vj;
+
     edge_struct *e_jk_struct = new edge_struct();
     e_jk_struct->v1 = vj;
     e_jk_struct->v2 = vk;
     e_jk_struct->v3 = vi;
+
+    // A list of edges to be removed from the front
     list<edge_struct *> removed;
+
     for (edge_struct *e_struct: front) {
       if ((e_struct->v1 == vi && e_struct->v2 == vk) || (e_struct->v1 == vk && e_struct->v2 == vi)) {
         e_ik_struct = e_struct;
@@ -695,7 +719,6 @@ namespace CGL
     FaceIter f_ijk = mesh.newFace();
 
     h_ij->edge() = e_ij;
-
     h_ij->twin() = e_ij->halfedge();
     e_ij->halfedge()->twin() = h_ij;
 
