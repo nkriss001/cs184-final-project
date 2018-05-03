@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+  pre {
+    display: inline;
+  }
+</style>
+<title>CS 184 Final Project</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+  
+<body>
+
+  <h1 align="middle">CS 184 Final Project Report: Triangle Mesh Generation from Point Clouds</h1>
+  <h2 align="middle">Allan Levy (26721352), Joseph Reid (26845757), Nicholas Kriss (26141698)</h2>
+
+
+  <br><br>
+
+
+  <h2 align="middle">Abstract</h2>
+  <p>
+    With the surging popularity of VR, video games, and animated movies, the demand for realistic renderings of objects has grown incredibly. However, the limiting factor in this growth is the difficulty in being able to artificially construct a realistic object from nothing. One way to bypass this is by using 3D scanners. 3D scanners are able to model an object in 3D space on a computer by gathering thousands of samples of the locations of points on the surface of an object. These points can then be displayed on a screen as a point cloud. However, in order to be able to interact with this object, we need to construct a mesh, a structure that combines these points with edges and faces that connect them. It is not trivial, though, to determine which vertices to connect, as there are often many neighboring candidate vertices to choose from. In this project, we first extend the MeshEdit executable to visualize point clouds. We then implement the Ball Pivot Algorithm (BPA) to build and then display a new mesh structure from these point clouds.
+  </p>
+
+
+  <!--- START: copied and pasted from milestone report 
+               should be re-written to better suit the report structure
+               add stuff we did after milestone report
+               add pseudocode / real code snippets
+               add explanations -->
+  <h2 align="middle">PLY Files and Point Cloud Display</h2>
+  <p>
+    At this point in the project, we have written a program to parse PLY files and display a point cloud. This is important because it allows us to visualize the data and to compare our completed mesh to after it has been constructed. Currently, this program only works on PLY files containing vertex positions, and has not yet been impmlemented to display a full PLY mesh with edges and faces. Also, the PLY files we are using from the <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3D Scanning Repository</a> do not include vertex normals, which are necessary so that the Ball Pivot Algorithm only creates orientable manifold objects. When we began the project, we did not consider that most of our test files would be a different format than the DAE files expected by the existing meshedit framework, so this portion of the project took up more time than expected. We also need to find a way to add vertex normals to the point cloud. For obtaining vertex normals, we have two options:
+    <ol>
+      <li>Average the surrounding face normals of a point supplied in the completed meshes that came with the PLY files</li>
+      <li>Convert the DAE files supplied in this class, which do have vertex normals, to PLY files so that we can use our current point cloud framework</li>
+    </ol>
+  </p>
+
+  <img src="images/bun000_point_cloud_1.png" align="middle"/>
+  <figcaption align="middle">Point cloud of the front of the Stanfurd Bunny</figcaption>
+
+  <img src="images/bun000_point_cloud_2.png" align="middle"/>
+  <figcaption align="middle">Point cloud of the front of the Stanfurd Bunny</figcaption>
+
+  <img src="images/bun000_point_cloud_3.png" align="middle"/>
+  <figcaption align="middle">Point cloud of the front of the Stanfurd Bunny</figcaption>
+  
+
+  <h2 align="middle">The Ball Pivot Algorithm</h2>
+  <p><pre></pre>
+    Our main progress has been in writing the pseudocode and basic framework for the Ball Pivot Algorithm. The basic layout and necessary functions are all present. Our current program includes five functions. The actual algorithm replaces the <pre>MeshResampler::upsample</pre> function in <pre>student_code.cpp</pre> in Project 2, so that there is an existing framework to run the program from the meshedit GUI. Also, until we add in the vertex normals, we are simply taking in existing complete meshes and stripping all features except the vertices. We still need to add the voxel grid structure, so that mesh construction does not take prohibitively long. The <pre>seed_triangle</pre> function, which returns a new seed triangle when the front is empty, is mostly complete except for a few syntax errors. We have completed the checks to create the sphere touching all three points, ensuring that it does not contain any other points and that the vertex normals point in the same direction as the face normal. The <pre>join</pre> and <pre>glue</pre> methods will add edges, faces, halfedges and boundaries to the mesh while potentially removing edges from the front. Adding elements to the mesh should not be too difficult. Finally, we have a completed function to find the center of a sphere of a given radius that touches three points in space.
+  </p>
+  <!-- END: c&p -->
+
+
+  <h2 align="middle">Results</h2>
+
+
+  <!-- UNCOMMENT AFTER VIDEO IS MADE
+  <h2 align="middle">Video</h2>
+  <video width="960px" controls>
+    <source src="videos/final.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  -->
+
+
+  <h2 align="middle">References</h2>
+  <ul>
+    <li><a href="https://vgc.poly.edu/~csilva/papers/tvcg99.pdf">The Ball-Pivoting Algorithm for Surface Reconstruction</a></li>
+    <li><a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanfurd 3D Scanning Repository</a></li>
+  </ul>
+
+
+  <h2 align="middle">Contributions</h2>
+  <ul>
+    <li>Allan: </li>
+    <li>Joseph: </li>
+    <li>Nicholas: </li>
+  </ul>
+
+
+</body>
+</html>
