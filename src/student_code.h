@@ -20,7 +20,6 @@ namespace CGL {
     struct vertex_struct {
       VertexIter v;
       bool used = false;
-      bool in_front = false;
     };
 
     struct edge_struct {
@@ -40,13 +39,13 @@ namespace CGL {
 
     void upsample(HalfedgeMesh& mesh);
     void ballPivot(HalfedgeMesh& mesh, double BPAr);
-    int hash_position(Vector3D pos, double r, int grid_width, int grid_height, Vector3D minDimensions);
-    vector<Vector3D> get_centers(Vector3D p1, Vector3D p2, Vector3D p3, double r);
+    int hash_position(Vector3D pos, double r, Vector3D dimensions, Vector3D minDimensions);
+    Vector3D get_center(Vector3D p1, Vector3D p2, Vector3D p3, double r, Vector3D n);
     void join(HalfedgeMesh& mesh, list<edge_struct *>& front, VertexIter vi, VertexIter vj, 
       VertexIter vk, EdgeIter e_ij);
     void glue(HalfedgeMesh& mesh, list<edge_struct *>& front, VertexIter vi, VertexIter vj, 
       VertexIter vk, EdgeIter e_ij);
-    Vector3D find_seed_triangle(HalfedgeMesh& mesh, vector<vector <vertex_struct *> >& voxels, 
+    bool find_seed_triangle(HalfedgeMesh& mesh, vector<vector <vertex_struct *> >& voxels, 
       vector<vertex_struct *> vertices, list<edge_struct *>& front, Vector3D dimensions, Vector3D minDimensions, double r);
   };
 }

@@ -16,6 +16,7 @@ namespace CGL {
   Vector3D Face::normal( void ) const
   {
     Vector3D N( 0., 0., 0. );
+    Vector3D actualN(0., 0., 0.);
 
     HalfedgeCIter h = halfedge();
     do
@@ -23,16 +24,18 @@ namespace CGL {
       VertexCIter pi = h->vertex();
       VertexCIter pj = h->next()->vertex();
       if (pi->norm[0] != INFINITY) {
-        N += (pi->norm)/3.0;
-      } else {
-        N += cross( pi->position, pj->position );
+        actualN += pi->norm;
       }
+      N += cross( pi->position, pj->position );
 
       h = h->next();
     }
     while( h != halfedge() );
-
-    return N.unit();
+    if (dot(N, actualN) >= 0) {
+      return N.unit();
+    } else {
+      return -N.unit();
+    }
   }
 
   void HalfedgeMesh :: build( const vector< vector<Index> >& polygons,
