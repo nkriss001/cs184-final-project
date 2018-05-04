@@ -36,32 +36,34 @@
 </head>
 
 <script>
-  var slideIndex = [1,1];
-  var slideId = ["cube", "quadball"]
-  showDivs(1, 0);
-  showDivs(1, 1);
+  var slideIndex = 1;
+  showDivs(slideIndex);
 
-  function plusDivs(n, no) {
-    showDivs(slideIndex[no] += n, no);
+  function plusDivs(n) {
+    showDivs(slideIndex += n);
   }
 
-  function currentDiv(n, no) {
-    showDivs(slideIndex[no] = n, no);
+  function currentDiv(n) {
+    showDivs(slideIndex = n);
   }
 
-  function showDivs(n, no) {
+  function showDivs(n) {
     var i;
-    var x = document.getElementsByClassName(slideId[no]);
-    if (n > x.length) {slideIndex[no] = 1}    
-    if (n < 1) {slideIndex[no] = x.length}
+    var x = document.getElementsByClassName("mySlides");
+    var dots = document.getElementsByClassName("demo");
+    if (n > x.length) {slideIndex = 1}    
+    if (n < 1) {slideIndex = x.length}
     for (i = 0; i < x.length; i++) {
        x[i].style.display = "none";  
     }
-    x[slideIndex[no]-1].style.display = "block";  
+    for (i = 0; i < dots.length; i++) {
+       dots[i].className = dots[i].className.replace(" w3-white", "");
+    }
+    x[slideIndex-1].style.display = "block";  
+    dots[slideIndex-1].className += " w3-white";
   }
 </script>
   
-
 <body>
 
   <h1 align="middle">CS 184 Final Project Report: Triangle Mesh Generation from Point Clouds</h1>
@@ -111,40 +113,10 @@
   <h2 align="middle">Results</h2>
 
 
-  <div class="w3-content w3-display-container">
-    <img class="cube" src="cube_pc.png" style="width:100%">
-    <img class="cube" src="cube_bpa.png" style="width:100%">
-    <img class="cube" src="cube_real.png" style="width:100%">
-    <button class="w3-button w3-black w3-display-left" onclick="plusDivs(-1, 0)">&#10094;</button>
-    <button class="w3-button w3-black w3-display-right" onclick="plusDivs(1, 0)">&#10095;</button>
-    <div class="w3-center w3-container w3-section w3-large w3-text-white w3-display-bottommiddle" style="width:100%">
-      <div class="w3-left w3-hover-text-khaki" onclick="plusDivs(-1, 0)">&#10094;</div>
-      <div class="w3-right w3-hover-text-khaki" onclick="plusDivs(1, 0)">&#10095;</div>
-      <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(1, 0)"></span>
-      <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(2, 0)"></span>
-      <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(3, 0)"></span>
-    </div>
-  </div>
-
-  <div class="w3-content w3-display-container">
-    <img class="quadball" src="quadball_pc.png" style="width:100%">
-    <img class="quadball" src="quadball_bpa.png" style="width:100%">
-    <img class="quadball" src="quadball_real.png" style="width:100%">
-    <button class="w3-button w3-black w3-display-left" onclick="plusDivs(-1, 1)">&#10094;</button>
-    <button class="w3-button w3-black w3-display-right" onclick="plusDivs(1, 1)">&#10095;</button>
-    <div class="w3-center w3-container w3-section w3-large w3-text-white w3-display-bottommiddle" style="width:100%">
-      <div class="w3-left w3-hover-text-khaki" onclick="plusDivs(-1, 1)">&#10094;</div>
-      <div class="w3-right w3-hover-text-khaki" onclick="plusDivs(1, 1)">&#10095;</div>
-      <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(1, 1)"></span>
-      <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(2, 1)"></span>
-      <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(3, 1)"></span>
-    </div>
-  </div>
-
-<!--   <div class="w3-content w3-display-container" style="max-width:800px">
-    <img class="cube" src="images/cube_pc.png" style="width:100%">
-    <img class="cube" src="images/cube_bpa.png" style="width:100%">
-    <img class="cube" src="images/cube_real.png" style="width:100%">
+  <div class="w3-content w3-display-container" style="max-width:800px">
+    <img class="mySlides" src="images/cube_pc.png" style="width:100%">
+    <img class="mySlides" src="images/cube_bpa.png" style="width:100%">
+    <img class="mySlides" src="images/cube_real.png" style="width:100%">
     <div class="w3-center w3-container w3-section w3-large w3-text-white w3-display-bottommiddle" style="width:100%">
       <div class="w3-left w3-hover-text-khaki" onclick="plusDivs(-1)">&#10094;</div>
       <div class="w3-right w3-hover-text-khaki" onclick="plusDivs(1)">&#10095;</div>
@@ -152,7 +124,7 @@
       <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(2)"></span>
       <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(3)"></span>
     </div>
-  </div> -->
+  </div>
 
   <!-- UNCOMMENT AFTER VIDEO IS MADE
   <h2 align="middle">Video</h2>
