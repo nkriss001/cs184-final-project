@@ -109,6 +109,9 @@
   </p>
   <!-- END: c&p -->
 
+<h2 align="middle">Problems and Solutions</h2>
+  <p>The first major problem we encountered was in finding valid inputs to the algorithm. Ball pivoting requires that we have access to the normal vectors for every vertex in the point cloud, so that we can be sure that the normal of each face is consistent with the normals of its vertices and that our final mesh will be orientable and manifold. However, the point clouds and meshes given by the Stanford repository do not have any face or vertex normals, so we decided to just use the .dae files given to us for Project 2 and calculated the vertex normals using the Vertex::normal function written for that assignment and saving them to a new Vector3D norm added to the VertexIter class. Since we take in a complete HalfedgeMesh but only want a point cloud, we have to delete the mesh's edges, halfedges, faces and boundaries at the start of the ball pivot algorithm. A related issue arose at the end of the project, since the default Face::normal function expects that the vertices are entered and subsequently accessed in a particular order, which will probably change when we rebuild the mesh. To fix this, we added a check so that Face::normal returns the unit normal vector sum of the cross products if it points in the same direction as the average of the vertex normals, and otherwise returns the unit normal vector in the opposite direction.</p>
+
 
   <h2 align="middle">Results</h2>
 
