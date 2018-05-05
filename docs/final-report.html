@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<style>
+  body {
+    padding: 100px;
+    width: 1000px;
+    margin: auto;
+    text-align: left;
+    font-weight: 300;
+    font-family: 'Open Sans', sans-serif;
+    color: #121212;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Source Sans Pro', sans-serif;
+  }
+  pre {
+    display: inline;
+  }
+  .cube, .quadball, .bean, .beetle, .maxplanck, .teapot {
+    display: none;
+  }
+  .w3-left, .w3-right, .w3-badge {
+    cursor: pointer;
+  }
+  .w3-badge {
+    height: 13px;
+    width: 13px;
+    padding: 0;
+  }
+</style>
+<title>CS 184 Final Project</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link href="https://www.w3schools.com/w3css/4/w3.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
+</head>
+
+<script>
+  var slideIndex = 1;
+  showDivs(slideIndex);
+
+  function plusDivs(n) {
+    showDivs(slideIndex += n);
+  }
+
+  function currentDiv(n) {
+    showDivs(slideIndex = n);
+  }
+
+  function showDivs(n) {
+    var i;
+    var x = document.getElementsByClassName("mySlides");
+    var dots = document.getElementsByClassName("demo");
+    if (n > x.length) {slideIndex = 1}    
+    if (n < 1) {slideIndex = x.length}
+    for (i = 0; i < x.length; i++) {
+       x[i].style.display = "none";  
+    }
+    for (i = 0; i < dots.length; i++) {
+       dots[i].className = dots[i].className.replace(" w3-white", "");
+    }
+    x[slideIndex-1].style.display = "block";  
+    dots[slideIndex-1].className += " w3-white";
+  }
+</script>
+  
+<body>
+
+  <h1 align="middle">CS 184 Final Project Report: Triangle Mesh Generation from Point Clouds</h1>
+  <h2 align="middle">Allan Levy (26721352), Joseph Reid (26845757), Nicholas Kriss (26141698)</h2>
+
+
+  <br><br>
+
+
+  <h2 align="middle">Abstract</h2>
+  <p>
+    With the surging popularity of VR, video games, and animated movies, the demand for realistic renderings of objects has grown incredibly. However, the limiting factor in this growth is the difficulty in being able to artificially construct a realistic object from nothing. One way to bypass this is by using 3D scanners. 3D scanners are able to model an object in 3D space on a computer by gathering thousands of samples of the locations of points on the surface of an object. These points can then be displayed on a screen as a point cloud. However, in order to be able to interact with this object, we need to construct a mesh, a structure that combines these points with edges and faces that connect them. It is not trivial, though, to determine which vertices to connect, as there are often many neighboring candidate vertices to choose from. In this project, we first extend the MeshEdit executable to visualize point clouds. We then implement the Ball Pivot Algorithm (BPA) to build and then display a new mesh structure from these point clouds.
+  </p>
+
+
+  <!--- START: copied and pasted from milestone report 
+               should be re-written to better suit the report structure
+               add stuff we did after milestone report
+               add pseudocode / real code snippets
+               add explanations -->
+  <h2 align="middle">PLY Files and Point Cloud Display</h2>
+  <p>
+    At this point in the project, we have written a program to parse PLY files and display a point cloud. This is important because it allows us to visualize the data and to compare our completed mesh to after it has been constructed. Currently, this program only works on PLY files containing vertex positions, and has not yet been impmlemented to display a full PLY mesh with edges and faces. Also, the PLY files we are using from the <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3D Scanning Repository</a> do not include vertex normals, which are necessary so that the Ball Pivot Algorithm only creates orientable manifold objects. When we began the project, we did not consider that most of our test files would be a different format than the DAE files expected by the existing meshedit framework, so this portion of the project took up more time than expected. We also need to find a way to add vertex normals to the point cloud. For obtaining vertex normals, we have two options:
+    <ol>
+      <li>Average the surrounding face normals of a point supplied in the completed meshes that came with the PLY files</li>
+      <li>Convert the DAE files supplied in this class, which do have vertex normals, to PLY files so that we can use our current point cloud framework</li>
+    </ol>
+  </p>
+
+  <img src="images/bun000_point_cloud_1.png" align="middle"/>
+  <figcaption align="middle">Point cloud of the front of the Stanfurd Bunny</figcaption>
+
+  <img src="images/bun000_point_cloud_2.png" align="middle"/>
+  <figcaption align="middle">Point cloud of the front of the Stanfurd Bunny</figcaption>
+
+  <img src="images/bun000_point_cloud_3.png" align="middle"/>
+  <figcaption align="middle">Point cloud of the front of the Stanfurd Bunny</figcaption>
+  
+
+  <h2 align="middle">The Ball Pivot Algorithm</h2>
+  <p><pre></pre>
+    Our main progress has been in writing the pseudocode and basic framework for the Ball Pivot Algorithm. The basic layout and necessary functions are all present. Our current program includes five functions. The actual algorithm replaces the <pre>MeshResampler::upsample</pre> function in <pre>student_code.cpp</pre> in Project 2, so that there is an existing framework to run the program from the meshedit GUI. Also, until we add in the vertex normals, we are simply taking in existing complete meshes and stripping all features except the vertices. We still need to add the voxel grid structure, so that mesh construction does not take prohibitively long. The <pre>seed_triangle</pre> function, which returns a new seed triangle when the front is empty, is mostly complete except for a few syntax errors. We have completed the checks to create the sphere touching all three points, ensuring that it does not contain any other points and that the vertex normals point in the same direction as the face normal. The <pre>join</pre> and <pre>glue</pre> methods will add edges, faces, halfedges and boundaries to the mesh while potentially removing edges from the front. Adding elements to the mesh should not be too difficult. Finally, we have a completed function to find the center of a sphere of a given radius that touches three points in space.
+  </p>
+  <!-- END: c&p -->
+
+<h2 align="middle">Problems and Solutions</h2>
+  <p>The first major problem we encountered was in finding valid inputs to the algorithm. Ball pivoting requires that we have access to the normal vectors for every vertex in the point cloud, so that we can be sure that the normal of each face is consistent with the normals of its vertices and that our final mesh will be orientable and manifold. However, the point clouds and meshes given by the Stanford repository do not have any face or vertex normals, so we decided to just use the .dae files given to us for Project 2 and calculated the vertex normals using the Vertex::normal function written for that assignment and saving them to a new Vector3D norm added to the VertexIter class. Since we take in a complete HalfedgeMesh but only want a point cloud, we have to delete the mesh's edges, halfedges, faces and boundaries at the start of the ball pivot algorithm. A related issue arose at the end of the project, since the default Face::normal function expects that the vertices are entered and subsequently accessed in a particular order, which will probably change when we rebuild the mesh. To fix this, we added a check so that Face::normal returns the unit normal vector sum of the cross products if it points in the same direction as the average of the vertex normals, and otherwise returns the unit normal vector in the opposite direction.</p>
+
+  <p>We also experienced many bugs in our early code, mostly related to the voxel grid and rotating the ball. To find the voxel containing a given vertex, we used a hash function that finds the x, y, and z positions of the voxel and calculates the position of the voxel in the vector of voxels. We initially copied the hash function code we wrote for Project 4, but this caused the program to crash on certain radius inputs. We eventually realized that the problem was that we were hashing with respect to the point (0, 0, 0), which caused some negative numbers to hash to a negative index. To fix this, we added a minDimensions input to the hash function, which we subtract from the absolute position of the point to get its position relative to the most negative corner of the bounding box. </p>
+    
+    <p>The other major issue was finding the first center on the trajectory around a given point. It was easy to use dot products to find the smaller angle between the lines connecting the original center with the midpoint and the new center with the midpoint, which would give us the angle along the trajectory. However, we needed to account for the direction of the rotation, so that for rotations "below" the surface of the triangle the actual angle would be 2*PI minus the calculated angle. By drawing it out, we initially thought we could solve this by checking that the cross product of the original radius, from the midpoint to the first center, with the new radius, from the midpoint to the new center, was in the same direction as the cross product between the old radius and the line from the midpoint to the circumcenter of the circle around the three vertices of the face. If these cross products were in the same direction, we could say that we were at least PI along the trajectory. However, this only accounted for the case where the circumcenter was on the same side of the rotation edge as the opposite vertex, and in fact the opposite relationship holds if the circumcenter is on the opposite side of the rotation line from the opposite vertex. Finally, we needed to add a small delta so that we only recalculate the angle of rotation if that angle is above a certain value. Otherwise, we might think that extremely non-zero rotations foward are actually extremely small rotations backwards and thus large rotations along our trajectory.</p>
+
+
+  <h2 align="middle">Results</h2>
+
+
+  <div class="w3-content w3-display-container" style="max-width:800px">
+    <img class="mySlides" src="images/cube_pc.png" style="width:100%">
+    <img class="mySlides" src="images/cube_bpa.png" style="width:100%">
+    <img class="mySlides" src="images/cube_real.png" style="width:100%">
+    <div class="w3-center w3-container w3-section w3-large w3-text-white w3-display-bottommiddle" style="width:100%">
+      <div class="w3-left w3-hover-text-khaki" onclick="plusDivs(-1)">&#10094;</div>
+      <div class="w3-right w3-hover-text-khaki" onclick="plusDivs(1)">&#10095;</div>
+      <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(1)"></span>
+      <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(2)"></span>
+      <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(3)"></span>
+    </div>
+  </div>
+
+  <!-- UNCOMMENT AFTER VIDEO IS MADE
+  <h2 align="middle">Video</h2>
+  <video width="960px" controls>
+    <source src="videos/final.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  -->
+
+
+  <h2 align="middle">References</h2>
+  <ul>
+    <li><a href="https://vgc.poly.edu/~csilva/papers/tvcg99.pdf">The Ball-Pivoting Algorithm for Surface Reconstruction</a></li>
+    <li><a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanfurd 3D Scanning Repository</a></li>
+  </ul>
+
+
+  <h2 align="middle">Contributions</h2>
+  <ul>
+    <li>Allan: </li>
+    <li>Joseph: </li>
+    <li>Nicholas: </li>
+  </ul>
+
+
+</body>
+</html>
