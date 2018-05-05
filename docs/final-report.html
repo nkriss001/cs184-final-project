@@ -17,6 +17,9 @@
   pre {
     display: inline;
   }
+  img {
+    width: 700px;
+  }
   .slideshow {
     max-width: 700px;
     position: relative;
@@ -159,14 +162,20 @@
     </ol>
   </p>
 
-  <img src="images/bun000_point_cloud_1.png" align="middle"/>
-  <figcaption align="middle">Point cloud of the front of the Stanfurd Bunny</figcaption>
+  <div align="middle">
+    <img src="images/bun000_point_cloud_1.png"/>
+    <figcaption align="middle">Point cloud of the front of the Stanfurd Bunny</figcaption>
 
-  <img src="images/bun000_point_cloud_2.png" align="middle"/>
-  <figcaption align="middle">Point cloud of the front of the Stanfurd Bunny</figcaption>
+    <br>
 
-  <img src="images/bun000_point_cloud_3.png" align="middle"/>
-  <figcaption align="middle">Point cloud of the front of the Stanfurd Bunny</figcaption>
+    <img src="images/bun000_point_cloud_2.png"/>
+    <figcaption align="middle">Point cloud of the front of the Stanfurd Bunny</figcaption>
+
+    <br>
+
+    <img src="images/bun000_point_cloud_3.png"/>
+    <figcaption align="middle">Point cloud of the front of the Stanfurd Bunny</figcaption>
+  </div>
   
 
   <h2 align="middle">The Ball Pivot Algorithm</h2>
@@ -189,7 +198,7 @@
   <h2 align="middle">Results</h2>
 
   <p><pre></pre>
-    Below are renders of the result of running BPA on several <pre>.DAE</pre> files given in Project 2. You can use the arrow buttons on the sides of the images to switch between views of the point cloud, BPA result, and given mesh.
+    Below are renders of the result of running BPA on several <pre>.DAE</pre> files given in Project 2. You can use the arrow buttons on the sides of the images to switch between views of the point cloud, BPA result, and mesh provided in Project 2 (used as a comparison).
   </p>
 
   <br>
@@ -254,8 +263,20 @@
 
   <br>
 
-  <!-- TODO: add blurb about how different
-             spacing of points makes BPA not work -->
+  <h2 align="middle">Challenges with BPA</h2>
+
+  <p>
+    As you have seen in the results above, the algorithm isn't perfect. A "good" radius for the ball size depends entirely on the location of the points within the point cloud and the concavity of the manifold.
+  </p>
+
+  <div align="middle">
+    <img src="images/bpa_2.png"/>
+  </div>
+
+  <p><pre></pre>
+    In image (b) above, too small of a radius results in the ball falling through the space between two neighboring vertices, resulting in a missed edge or face. In image (c), too big of a radius results in creating incorrect edges and faces in concave areas. Below, <pre>teapot.dae</pre> shows this tradeoff.
+  </p>
+
   <h3 align="middle"><pre>teapot.dae</pre></h3>
   <div class="slideshow">
     <img id="teapot" style="width:100%">
@@ -265,15 +286,24 @@
       <div class="next" onclick="incrementSlides(1, 'teapot')">&#10095;</div>
     </div>
   </div>
-  <!-- END TODO -->
 
-  <!-- UNCOMMENT AFTER VIDEO IS MADE
+  <p><pre></pre>
+    The teapot works much worse than the other objects above because the points are very unevenly spaced apart. On the sides of the teapot, the points are spread far apart. However, on the handle, spout, and near the edges, the points are much more close together. Therefore, this one-size-fits-all approach of BPA with one ball radius fails to create an accurate mesh.
+  </p>
+
+  <p>
+    There are a few ways to solve this problem, though. One way to fix this is (1) when 3D-scanning the object, sample more evenly from the object. This is demonstrated in the Max Planck rendering, which despite having many more points than teapot, has a much more accurate mesh because its points were sampled more closely together. Another way to solve this issue would be to (2) run BPA multiple times with different size radii. If we had more time for this project, we would have done just that. The challenge with this, though, is that vertices are marked as "used" and not returned to again. Therefore, if we were to discover an area where a certain radius was unsuccessful in creating a face, we would have to mark those vertices as "unused" first before running BPA again with a different radius.
+  </p>
+
+  <br>
+
   <h2 align="middle">Video</h2>
-  <video width="960px" controls>
-    <source src="videos/final.mp4" type="video/mp4">
-    Your browser does not support the video tag.
-  </video>
-  -->
+  <div align="middle">
+    <video width="700px" controls>
+      <source src="videos/final.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+  </div>
 
 
   <h2 align="middle">References</h2>
