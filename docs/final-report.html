@@ -147,19 +147,30 @@
     With the surging popularity of VR, video games, and animated movies, the demand for realistic renderings of objects has grown incredibly. However, the limiting factor in this growth is the difficulty in being able to artificially construct a realistic object from nothing. One way to bypass this is by using 3D scanners. 3D scanners are able to model an object in 3D space on a computer by gathering thousands of samples of the locations of points on the surface of an object. These points can then be displayed on a screen as a point cloud. However, in order to be able to interact with this object, we need to construct a mesh, a structure that combines these points with edges and faces that connect them. It is not trivial, though, to determine which vertices to connect, as there are often many neighboring candidate vertices to choose from. In this project, we first extend the MeshEdit executable to visualize point clouds. We then implement the Ball Pivot Algorithm (BPA) to build and then display a new mesh structure from these point clouds.
   </p>
 
+  <br>
 
-  <!--- START: copied and pasted from milestone report 
-               should be re-written to better suit the report structure
-               add stuff we did after milestone report
-               add pseudocode / real code snippets
-               add explanations -->
+
+
+  <h2 align="middle">The Ball Pivot Algorithm</h2>
+
+  <p><pre></pre>
+    To build our mesh, we implemented the Ball Pivot Algorithm to iteratively find triangles. The general idea is to simulate a ball with radius <pre>r</pre>, which is wide enough that the ball can "sit" between 3 points in the cloud without falling through. We create a triangle using those 3 points and "rotate" the ball around one of that triangle's edges. If the ball is stopped in its rotation by another vertex, then edges are added to the mesh to create a triangle between the rotated edge and that point. This is repeated until we find no more triangles to add. To begin, we divide up the mesh into a 3D grid of voxels in order to more efficiently find neighboring vertices to a given point. We then determine a "seed triangle", or an arbitrary set of 3 vertices that satisfy the necessary conditions to allow the simulated ball to sit upon them. We create edges between those 3 vertices and add the resulting triangle to our mesh. These 3 edges are placed into a queue called the "Front." In the Front, each edge stores its bounding vertices, the position of the ball when the edge was created, and whether the edge is a boundary (i.e. the rotated ball found nothing, and therefore there are no further triangles to make from this edge). We iteratively pop edges off of the Front and rotate the ball around them. If the ball finds a point, edges are created from our active edge to the new point, the new edges are added to the Front, and the new triangle is added to the mesh. The active edge is removed from the Front because it is no longer on the outside edge of our mesh and is therefore no longer useful for finding new triangles in a manifold object. We continue rotating the ball around all edges in the Front until the Front is empty. At this point, we search for a new seed triangle, in case there are disjoint pieces of the point cloud which must be processed. Once there are no more seed triangles to be found, the algorithm is complete.
+  </p>
+
+  <br>
+
+  <div align="middle">
+    <img src="images/bpa_3.png"/>
+    <figcaption align="middle">BPA pseudocode</figcaption>
+  </div>
+
+  <br>
+
+
+
   <h2 align="middle">PLY Files and Point Cloud Display</h2>
-  <p>
-    At this point in the project, we have written a program to parse PLY files and display a point cloud. This is important because it allows us to visualize the data and to compare our completed mesh to after it has been constructed. Currently, this program only works on PLY files containing vertex positions, and has not yet been impmlemented to display a full PLY mesh with edges and faces. Also, the PLY files we are using from the <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanford 3D Scanning Repository</a> do not include vertex normals, which are necessary so that the Ball Pivot Algorithm only creates orientable manifold objects. When we began the project, we did not consider that most of our test files would be a different format than the DAE files expected by the existing meshedit framework, so this portion of the project took up more time than expected. We also need to find a way to add vertex normals to the point cloud. For obtaining vertex normals, we have two options:
-    <ol>
-      <li>Average the surrounding face normals of a point supplied in the completed meshes that came with the PLY files</li>
-      <li>Convert the DAE files supplied in this class, which do have vertex normals, to PLY files so that we can use our current point cloud framework</li>
-    </ol>
+  <p><pre></pre>
+    Before we began implmenting BPA, we wanted to be able to visualize the point clouds. This would allow us to visualize the data and to compare our completed mesh with after it was constructed. Therefore, we first wrote a program to parse the <pre>.PLY</pre> files given from the <a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanfurd 3D Scanning Repository</a> and display the point clouds. Below are a few screenshots of the point cloud of the Stanfurd bunny.
   </p>
 
   <div align="middle">
@@ -176,23 +187,59 @@
     <img src="images/bun000_point_cloud_3.png"/>
     <figcaption align="middle">Point cloud of the front of the Stanfurd Bunny</figcaption>
   </div>
-  
 
-  <h2 align="middle">The Ball Pivot Algorithm</h2>
-  <p><pre></pre>
-    --------------------------------OLD--------------------------------------
-    Our main progress has been in writing the pseudocode and basic framework for the Ball Pivot Algorithm. The basic layout and necessary functions are all present. Our current program includes five functions. The actual algorithm replaces the <pre>MeshResampler::upsample</pre> function in <pre>student_code.cpp</pre> in Project 2, so that there is an existing framework to run the program from the meshedit GUI. Also, until we add in the vertex normals, we are simply taking in existing complete meshes and stripping all features except the vertices. We still need to add the voxel grid structure, so that mesh construction does not take prohibitively long. The <pre>seed_triangle</pre> function, which returns a new seed triangle when the front is empty, is mostly complete except for a few syntax errors. We have completed the checks to create the sphere touching all three points, ensuring that it does not contain any other points and that the vertex normals point in the same direction as the face normal. The <pre>join</pre> and <pre>glue</pre> methods will add edges, faces, halfedges and boundaries to the mesh while potentially removing edges from the front. Adding elements to the mesh should not be too difficult. Finally, we have a completed function to find the center of a sphere of a given radius that touches three points in space.
-    ---------------------------------OLD----------------------------------------
+  <br>
+
+  <p>
+    However, shortly after finishing this we ran into our first problem. While reading through the <pre>.PLY</pre> files, we realized that they did not contain the point normals. These normal vectors are necessary in BPA to be able to determine which way "out" and "in" are so that it knows which way to rotate the ball to create an orientable manifold. This was a big setback because we had already invested much time into creating the <pre>.PLY</pre> to Display pipeline. After realizing that BPA would not work well without these point normals, we came up with two options to remedy this:
+    <ol>
+      <li>Average the surrounding face normals of a point supplied in the completed meshes that came with the <pre>.PLY</pre> files</li>
+      <li>Average the surrounding face normals of each point in the <pre>.DAE</pre> files of the completed meshes from Project 2 in order to estimate the point normals</li>
+    </ol>
+    We chose the second.
   </p>
-  <p>To build our mesh, we implemented the Ball Pivot Algorithm to iteratively find triangles. The general idea is to simulate a ball with radius r, which is wide enough that the ball can "sit" between 3 points in the cloud without falling through. We create a triangle using those 3 points and "rotate" the ball around one of that triangle's edges. If the ball is stopped in its rotation by another vertex, then edges are added to the mesh to create a triangle between the rotated edge and that point. This is repeated until we find no more triangles to add. To begin, we divide up the mesh into a 3D grid of voxels in order to more efficiently find neighboring vertices to a given point. We then determine a "seed triangle", or an arbitrary set of 3 vertices that satisfy the necessary conditions to allow the simulated ball to sit upon them. We create edges between those 3 vertices and add the resulting triangle to our mesh. These 3 edges are placed into a queue called the Front. In the Front, each edge stores its bounding vertices, the position of the ball when the edge was created, and whether the edge is a boundary (i.e. the rotated ball found nothing, and therefore there are no further triangles to make from this edge). We iteratively pop edges off of the Front and rotate the ball around them. If the ball finds a point, edges are created from our active edge to the new point, the new edges are added to the Front, and the new triangle is added to the mesh. The active edge is removed from the Front because it is no longer on the outside edge of our mesh and is therefore no longer useful for finding new triangles in a manifold object. We continue rotating the ball around all edges in the Front until the Front is empty. At this point, we search for a new seed triangle, in case there are disjoint pieces of the point cloud which must be processed. Once there are no more seed triangles to be found, the algorithm is complete.</p>
-  <!-- END: c&p -->
 
-<h2 align="middle">Problems and Solutions</h2>
-  <p>The first major problem we encountered was in finding valid inputs to the algorithm. Ball pivoting requires that we have access to the normal vectors for every vertex in the point cloud, so that we can be sure that the normal of each face is consistent with the normals of its vertices and that our final mesh will be orientable and manifold. However, the point clouds and meshes given by the Stanford repository do not have any face or vertex normals, so we decided to just use the .dae files given to us for Project 2 and calculated the vertex normals using the Vertex::normal function written for that assignment and saving them to a new Vector3D norm added to the VertexIter class. Since we take in a complete HalfedgeMesh but only want a point cloud, we have to delete the mesh's edges, halfedges, faces and boundaries at the start of the ball pivot algorithm. A related issue arose at the end of the project, since the default Face::normal function expects that the vertices are entered and subsequently accessed in a particular order, which will probably change when we rebuild the mesh. To fix this, we added a check so that Face::normal returns the unit normal vector sum of the cross products if it points in the same direction as the average of the vertex normals, and otherwise returns the unit normal vector in the opposite direction.</p>
+  <br>
 
-  <p>We also experienced many bugs in our early code, mostly related to the voxel grid and rotating the ball. To find the voxel containing a given vertex, we used a hash function that finds the x, y, and z positions of the voxel and calculates the position of the voxel in the vector of voxels. We initially copied the hash function code we wrote for Project 4, but this caused the program to crash on certain radius inputs. We eventually realized that the problem was that we were hashing with respect to the point (0, 0, 0), which caused some negative numbers to hash to a negative index. To fix this, we added a minDimensions input to the hash function, which we subtract from the absolute position of the point to get its position relative to the most negative corner of the bounding box. </p>
+
+
+  <h2 align="middle">Implementation</h2>
+
+  <p><pre></pre>
+    After adding a command line flag <pre>-p</pre> to be able to visualize a <pre>.DAE</pre> point cloud by only displaying the points, we began implementing BPA, which includes five new functions. The actual algorithm replaces the <pre>MeshResampler::upsample</pre> function in <pre>student_code.cpp</pre> in Project 2, so that there is an existing framework to run the program from the meshedit GUI. It begins by loading a <pre>.DAE</pre> file like normal. When the "p" key is pressed, BPA begins to run. First, for each point it averages the surround face normals and adds that normal into the <pre>Vertex</pre> object's <pre>normal</pre> attribute. We then clear all of the edges and faces, leaving us with just the points and their normals. We then begin the actual algorithm, which includes several of the helper functions shown above in the pseudocode. These include:
+    <ul>
+      <li><pre>seed_triangle(...)</pre>: returns a new seed triangle when the front is empty; also creates the sphere touching all three points, ensuring that it does not contain any other points and that the vertex normals point in the same direction as the face normal</li>
+      <li><pre>join(...)</pre>: joins the edge being pivoted around with a vertex to create a new face</li>
+      <li><pre>glue(...)</pre>: "glues" together two halfedges to form one edge; this occurs when one halfedge is already in the Front, and removes the edge from the Front</li>
+      <li><pre>get_center(...)</pre>: finds the center of a sphere of a given radius that touches three given points in space</li>
+    </ul>
+  </p>
+
+  <div align="middle">
+    <img src="images/bpa_1.png"/>
+    <!-- <figcaption align="middle">BPA pseudocode</figcaption> -->
+  </div>
+
+  <br>
+
+
+
+  <h2 align="middle">Problems and Solutions</h2>
+
+  <p><pre></pre>
+    As specified earlier, the first major problem we encountered was in finding valid inputs to the algorithm. BPA requires that we have access to the normal vectors for every vertex in the point cloud, so that we can be sure that the normal of each face is consistent with the normals of its vertices and that our final mesh will be orientable and manifold. However, the point clouds and meshes given by the Stanfurd Repository do not have any face or vertex normals, so we decided to just use the <pre>.DAE</pre> files given to us for Project 2 and calculated the vertex normals using the <pre>Vertex::normal(...)</pre> function written for that assignment and saving them to a new <pre>Vector3D</pre> norm added to the <pre>VertexIter</pre> class. Since we take in a complete <pre>HalfedgeMesh</pre> but only want a point cloud, we have to delete the mesh's edges, halfedges, faces, and boundaries at the start of the algorithm. A related issue arose at the end of the project, since the default <pre>Face::normal</pre> function expects that the vertices are entered and subsequently accessed in a particular order, which will probably change when we rebuild the mesh. To fix this, we added a check so that <pre>Face::normal</pre> returns the unit normal vector sum of the cross products if it points in the same direction as the average of the vertex normals, and otherwise returns the unit normal vector in the opposite direction.
+  </p>
+
+  <p>
+    We also experienced many bugs in our early code, mostly related to the voxel grid and rotating the ball. To find the voxel containing a given vertex, we used a hash function that finds the <pre>x</pre>, <pre>y</pre>, and <pre>z</pre> positions of the voxel and calculates the position of the voxel in the vector of voxels. We initially copied the hash function code we wrote for Project 4, but this caused the program to crash on certain radius inputs. We eventually realized that the problem was that we were hashing with respect to the point <pre>(0, 0, 0)</pre>, which caused some negative numbers to hash to a negative index. To fix this, we added a <pre>minDimensions</pre> input to the hash function, which we subtract from the absolute position of the point to get its position relative to the most negative corner of the bounding box.
+  </p>
     
-    <p>The other major issue was finding the first center on the trajectory around a given point. It was easy to use dot products to find the smaller angle between the lines connecting the original center with the midpoint and the new center with the midpoint, which would give us the angle along the trajectory. However, we needed to account for the direction of the rotation, so that for rotations "below" the surface of the triangle the actual angle would be 2*PI minus the calculated angle. By drawing it out, we initially thought we could solve this by checking that the cross product of the original radius, from the midpoint to the first center, with the new radius, from the midpoint to the new center, was in the same direction as the cross product between the old radius and the line from the midpoint to the circumcenter of the circle around the three vertices of the face. If these cross products were in the same direction, we could say that we were at least PI along the trajectory. However, this only accounted for the case where the circumcenter was on the same side of the rotation edge as the opposite vertex, and in fact the opposite relationship holds if the circumcenter is on the opposite side of the rotation line from the opposite vertex. Finally, we needed to add a small delta so that we only recalculate the angle of rotation if that angle is above a certain value. Otherwise, we might think that extremely non-zero rotations foward are actually extremely small rotations backwards and thus large rotations along our trajectory.</p>
+  <p>
+    The other major issue was finding the first center on the trajectory around a given point. It was easy to use dot products to find the smaller angle between the lines connecting the original center with the midpoint and the new center with the midpoint, which would give us the angle along the trajectory. However, we needed to account for the direction of the rotation, so that for rotations "below" the surface of the triangle the actual angle would be <pre>2*PI</pre> minus the calculated angle. By drawing it out, we initially thought we could solve this by checking that the cross product of the original radius, from the midpoint to the first center, with the new radius, from the midpoint to the new center, was in the same direction as the cross product between the old radius and the line from the midpoint to the circumcenter of the circle around the three vertices of the face. If these cross products were in the same direction, we could say that we were at least <pre>PI</pre> along the trajectory. However, this only accounted for the case where the circumcenter was on the same side of the rotation edge as the opposite vertex, and in fact the opposite relationship holds if the circumcenter is on the opposite side of the rotation line from the opposite vertex. Finally, we needed to add a small delta so that we only recalculate the angle of rotation if that angle is above a certain value. Otherwise, we might think that extremely non-zero rotations foward are actually extremely small rotations backwards and thus large rotations along our trajectory.
+  </p>
+
+  <br>
+
 
 
   <h2 align="middle">Results</h2>
@@ -263,6 +310,8 @@
 
   <br>
 
+
+
   <h2 align="middle">Challenges with BPA</h2>
 
   <p>
@@ -307,6 +356,7 @@
 
 
   <h2 align="middle">References</h2>
+  
   <ul>
     <li><a href="https://vgc.poly.edu/~csilva/papers/tvcg99.pdf">The Ball-Pivoting Algorithm for Surface Reconstruction</a></li>
     <li><a href="http://graphics.stanford.edu/data/3Dscanrep/">Stanfurd 3D Scanning Repository</a></li>
@@ -314,9 +364,10 @@
 
 
   <h2 align="middle">Contributions</h2>
-  <ul>
-    <li>Allan: Project planning, Initial algorithm pseudocode, various debugging, milestone video, final presentation slides</li>
-    <li>Joseph: </li>
+  
+  <ul><pre></pre>
+    <li>Allan: project planning, initial algorithm pseudocode, various debugging, milestone video, final presentation slides</li>
+    <li>Joseph: <pre>.PLY</pre> to visualizing point cloud pipeline, additional command line flags, milestone video, final video, write-ups, presentation slides, various debugging</li>
     <li>Nicholas: </li>
   </ul>
 
