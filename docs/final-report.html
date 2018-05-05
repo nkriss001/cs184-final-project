@@ -17,52 +17,118 @@
   pre {
     display: inline;
   }
-  .cube, .quadball, .bean, .beetle, .maxplanck, .teapot {
-    display: none;
+  .slideshow {
+    max-width: 700px;
+    position: relative;
+    margin: auto;
   }
-  .w3-left, .w3-right, .w3-badge {
+  /* Next & previous buttons */
+  .prev, .next {
     cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    margin-top: -22px;
+    padding: 16px;
+    color: white;
+    font-weight: bold;
+    font-size: 36px;
+    transition: 0.6s ease;
+    border-radius: 0 3px 3px 0;
   }
-  .w3-badge {
-    height: 13px;
-    width: 13px;
-    padding: 0;
+
+  /* Position the "next button" to the right */
+  .next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+  }
+
+  /* On hover, add a black background color with a little bit see-through */
+  .prev:hover, .next:hover {
+    background-color: white;
+    color: black;
   }
 </style>
 <title>CS 184 Final Project</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link href="https://www.w3schools.com/w3css/4/w3.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
 </head>
 
+
 <script>
-  var slideIndex = 1;
-  showDivs(slideIndex);
+  var images = ['cube', 'quadball', 'bean', 'beetle', 'maxplanck', 'teapot'];
 
-  function plusDivs(n) {
-    showDivs(slideIndex += n);
+  var currentSlides = {};
+  for (var i = 0; i < images.length; i++) {
+    currentSlides[images[i]] = 0;
   }
 
-  function currentDiv(n) {
-    showDivs(slideIndex = n);
+  var slideClasses = {};
+  slideClasses['cube'] = ['images/cube_pc.png',
+                          'images/cube_bpa.png',
+                          'images/cube_real.png',];
+  slideClasses['quadball'] = ['images/quadball_pc.png',
+                              'images/quadball_bpa.png',
+                              'images/quadball_real.png',];
+  slideClasses['bean'] = ['images/bean_pc.png',
+                          'images/bean_bpa.png',
+                          'images/bean_real.png',];
+  slideClasses['beetle'] = ['images/beetle_pc.png',
+                            'images/beetle_bpa.png',
+                            'images/beetle_real.png',];
+  slideClasses['maxplanck'] = ['images/maxplanck_pc.png',
+                               'images/maxplanck_bpa1.png',
+                               'images/maxplanck_bpa2.png',
+                               'images/maxplanck_real1.png',
+                               'images/maxplanck_real2.png',];
+  slideClasses['teapot'] = ['images/teapot_pc2.png',
+                            'images/teapot_bpa1.png',
+                            'images/teapot_bpa2.png',
+                            'images/teapot_real.png',];
+
+  var slideCaptions = {};
+  slideCaptions['cube'] = ['Point Cloud (there are only 8 points, so they are difficult to see)',
+                           'BPA solution with <pre>r = 2.0</pre>',
+                           'Actual mesh',];
+  slideCaptions['quadball'] = ['Point Cloud',
+                               'BPA solution with <pre>r = 0.5</pre>',
+                               'Actual mesh',];
+  slideCaptions['bean'] = ['Point Cloud',
+                           'BPA solution with <pre>r = 0.2</pre>',
+                           'Actual mesh',];
+  slideCaptions['beetle'] = ['Point Cloud',
+                             'BPA solution with <pre>r = 0.04</pre>',
+                             'Actual mesh',];
+  slideCaptions['maxplanck'] = ['Point Cloud',
+                                'BPA solution with <pre>r = 0.025</pre>',
+                                'BPA solution with <pre>r = 0.025</pre> (zoomed in)',
+                                'Actual mesh',
+                                'Actual mesh (zoomed in)',];
+  slideCaptions['teapot'] = ['Point Cloud',
+                             'BPA solution with <pre>r = 0.1</pre>',
+                             'BPA solution with <pre>r = 0.05</pre>',
+                             'Actual mesh',];
+  
+  document.addEventListener("DOMContentLoaded", function(event) {
+    for (var i = 0; i < images.length; i++) {
+      showSlide(0, images[i]);
+    }
+  });
+
+  function incrementSlides(n, imgId) {
+    var newSlide = (currentSlides[imgId] + n) % slideClasses[imgId].length;
+    currentSlides[imgId] = newSlide;
+    showSlide(newSlide, imgId);
   }
 
-  function showDivs(n) {
-    var i;
-    var x = document.getElementsByClassName("mySlides");
-    var dots = document.getElementsByClassName("demo");
-    if (n > x.length) {slideIndex = 1}    
-    if (n < 1) {slideIndex = x.length}
-    for (i = 0; i < x.length; i++) {
-       x[i].style.display = "none";  
-    }
-    for (i = 0; i < dots.length; i++) {
-       dots[i].className = dots[i].className.replace(" w3-white", "");
-    }
-    x[slideIndex-1].style.display = "block";  
-    dots[slideIndex-1].className += " w3-white";
+  function showSlide(n, imgId) {
+    var slides = document.getElementById(imgId);
+    slides.src = slideClasses[imgId][n];
+    var caption = document.getElementById(imgId + '_caption');
+    caption.innerHTML = slideCaptions[imgId][n];
   }
 </script>
+
   
 <body>
 
@@ -119,19 +185,84 @@
 
   <h2 align="middle">Results</h2>
 
+  <p><pre></pre>
+    Below are renders of the result of running BPA on several <pre>.DAE</pre> files given in Project 2. You can use the arrow buttons on the sides of the images to switch between views of the point cloud, BPA result, and given mesh.
+  </p>
 
-  <div class="w3-content w3-display-container" style="max-width:800px">
-    <img class="mySlides" src="images/cube_pc.png" style="width:100%">
-    <img class="mySlides" src="images/cube_bpa.png" style="width:100%">
-    <img class="mySlides" src="images/cube_real.png" style="width:100%">
-    <div class="w3-center w3-container w3-section w3-large w3-text-white w3-display-bottommiddle" style="width:100%">
-      <div class="w3-left w3-hover-text-khaki" onclick="plusDivs(-1)">&#10094;</div>
-      <div class="w3-right w3-hover-text-khaki" onclick="plusDivs(1)">&#10095;</div>
-      <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(1)"></span>
-      <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(2)"></span>
-      <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(3)"></span>
+  <br>
+
+  <h3 align="middle"><pre>cube.dae</pre></h3>
+  <div class="slideshow">
+    <img id="cube" style="width:100%">
+    <figcaption align="middle" id="cube_caption"></figcaption>
+    <div class="arrows" style="width:100%">
+      <div class="prev" onclick="incrementSlides(-1, 'cube')">&#10094;</div>
+      <div class="next" onclick="incrementSlides(1, 'cube')">&#10095;</div>
     </div>
   </div>
+
+  <br>
+
+  <h3 align="middle"><pre>quadball.dae</pre></h3>
+  <div class="slideshow">
+    <img id="quadball" style="width:100%">
+    <figcaption align="middle" id="quadball_caption"></figcaption>
+    <div class="arrows" style="width:100%">
+      <div class="prev" onclick="incrementSlides(-1, 'quadball')">&#10094;</div>
+      <div class="next" onclick="incrementSlides(1, 'quadball')">&#10095;</div>
+    </div>
+  </div>
+
+  <br>
+
+  <h3 align="middle"><pre>bean.dae</pre></h3>
+  <div class="slideshow">
+    <img id="bean" style="width:100%">
+    <figcaption align="middle" id="bean_caption"></figcaption>
+    <div class="arrows" style="width:100%">
+      <div class="prev" onclick="incrementSlides(-1, 'bean')">&#10094;</div>
+      <div class="next" onclick="incrementSlides(1, 'bean')">&#10095;</div>
+    </div>
+  </div>
+
+  <br>
+
+  <h3 align="middle"><pre>beetle.dae</pre></h3>
+  <div class="slideshow">
+    <img id="beetle" style="width:100%">
+    <figcaption align="middle" id="beetle_caption"></figcaption>
+    <div class="arrows" style="width:100%">
+      <div class="prev" onclick="incrementSlides(-1, 'beetle')">&#10094;</div>
+      <div class="next" onclick="incrementSlides(1, 'beetle')">&#10095;</div>
+    </div>
+  </div>
+
+  <br>
+
+  <h3 align="middle"><pre>maxplanck.dae</pre></h3>
+  <div class="slideshow">
+    <img id="maxplanck" style="width:100%">
+    <figcaption align="middle" id="maxplanck_caption"></figcaption>
+    <div class="arrows" style="width:100%">
+      <div class="prev" onclick="incrementSlides(-1, 'maxplanck')">&#10094;</div>
+      <div class="next" onclick="incrementSlides(1, 'maxplanck')">&#10095;</div>
+    </div>
+  </div>
+
+  <br>
+
+  <!-- TODO: add blurb about how different
+             spacing of points makes BPA not work -->
+  <h3 align="middle"><pre>teapot.dae</pre></h3>
+  <div class="slideshow">
+    <img id="teapot" style="width:100%">
+    <figcaption align="middle" id="teapot_caption"></figcaption>
+    <div class="arrows" style="width:100%">
+      <div class="prev" onclick="incrementSlides(-1, 'teapot')">&#10094;</div>
+      <div class="next" onclick="incrementSlides(1, 'teapot')">&#10095;</div>
+    </div>
+  </div>
+  <!-- END TODO -->
 
   <!-- UNCOMMENT AFTER VIDEO IS MADE
   <h2 align="middle">Video</h2>
