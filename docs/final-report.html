@@ -17,52 +17,118 @@
   pre {
     display: inline;
   }
-  .cube, .quadball, .bean, .beetle, .maxplanck, .teapot {
-    display: none;
+  .slideshow {
+    max-width: 700px;
+    position: relative;
+    margin: auto;
   }
-  .w3-left, .w3-right, .w3-badge {
+  /* Next & previous buttons */
+  .prev, .next {
     cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    margin-top: -22px;
+    padding: 16px;
+    color: white;
+    font-weight: bold;
+    font-size: 36px;
+    transition: 0.6s ease;
+    border-radius: 0 3px 3px 0;
   }
-  .w3-badge {
-    height: 13px;
-    width: 13px;
-    padding: 0;
+
+  /* Position the "next button" to the right */
+  .next {
+    right: 0;
+    border-radius: 3px 0 0 3px;
+  }
+
+  /* On hover, add a black background color with a little bit see-through */
+  .prev:hover, .next:hover {
+    background-color: white;
+    color: black;
   }
 </style>
 <title>CS 184 Final Project</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-<link href="https://www.w3schools.com/w3css/4/w3.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Open+Sans|Source+Sans+Pro" rel="stylesheet">
 </head>
 
+
 <script>
-  var slideIndex = 1;
-  showDivs(slideIndex);
+  var images = ['cube', 'quadball', 'bean', 'beetle', 'maxplanck', 'teapot'];
 
-  function plusDivs(n) {
-    showDivs(slideIndex += n);
+  var currentSlides = {};
+  for (var i = 0; i < images.length; i++) {
+    currentSlides[images[i]] = 0;
   }
 
-  function currentDiv(n) {
-    showDivs(slideIndex = n);
+  var slideClasses = {};
+  slideClasses['cube'] = ['images/cube_pc.png',
+                          'images/cube_bpa.png',
+                          'images/cube_real.png',];
+  slideClasses['quadball'] = ['images/quadball_pc.png',
+                              'images/quadball_bpa.png',
+                              'images/quadball_real.png',];
+  slideClasses['bean'] = ['images/bean_pc.png',
+                          'images/bean_bpa.png',
+                          'images/bean_real.png',];
+  slideClasses['beetle'] = ['images/beetle_pc.png',
+                            'images/beetle_bpa.png',
+                            'images/beetle_real.png',];
+  slideClasses['maxplanck'] = ['images/maxplanck_pc.png',
+                               'images/maxplanck_bpa1.png',
+                               'images/maxplanck_bpa2.png',
+                               'images/maxplanck_real1.png',
+                               'images/maxplanck_real2.png',];
+  slideClasses['teapot'] = ['images/teapot_pc2.png',
+                            'images/teapot_bpa1.png',
+                            'images/teapot_bpa2.png',
+                            'images/teapot_real.png',];
+
+  var slideCaptions = {};
+  slideCaptions['cube'] = ['Point Cloud (there are only 8 points, so they are difficult to see)',
+                           'BPA solution with <pre>r = 2.0</pre>',
+                           'Actual mesh',];
+  slideCaptions['quadball'] = ['Point Cloud',
+                               'BPA solution with <pre>r = 0.5</pre>',
+                               'Actual mesh',];
+  slideCaptions['bean'] = ['Point Cloud',
+                           'BPA solution with <pre>r = 0.2</pre>',
+                           'Actual mesh',];
+  slideCaptions['beetle'] = ['Point Cloud',
+                             'BPA solution with <pre>r = 0.04</pre>',
+                             'Actual mesh',];
+  slideCaptions['maxplanck'] = ['Point Cloud',
+                                'BPA solution with <pre>r = 0.025</pre>',
+                                'BPA solution with <pre>r = 0.025</pre> (zoomed in)',
+                                'Actual mesh',
+                                'Actual mesh (zoomed in)',];
+  slideCaptions['teapot'] = ['Point Cloud',
+                             'BPA solution with <pre>r = 0.1</pre>',
+                             'BPA solution with <pre>r = 0.05</pre>',
+                             'Actual mesh',];
+  
+  document.addEventListener("DOMContentLoaded", function(event) {
+    for (var i = 0; i < images.length; i++) {
+      showSlide(0, images[i]);
+    }
+  });
+
+  function incrementSlides(n, imgId) {
+    var newSlide = (currentSlides[imgId] + n) % slideClasses[imgId].length;
+    currentSlides[imgId] = newSlide;
+    showSlide(newSlide, imgId);
   }
 
-  function showDivs(n) {
-    var i;
-    var x = document.getElementsByClassName("mySlides");
-    var dots = document.getElementsByClassName("demo");
-    if (n > x.length) {slideIndex = 1}    
-    if (n < 1) {slideIndex = x.length}
-    for (i = 0; i < x.length; i++) {
-       x[i].style.display = "none";  
-    }
-    for (i = 0; i < dots.length; i++) {
-       dots[i].className = dots[i].className.replace(" w3-white", "");
-    }
-    x[slideIndex-1].style.display = "block";  
-    dots[slideIndex-1].className += " w3-white";
+  function showSlide(n, imgId) {
+    var slides = document.getElementById(imgId);
+    slides.src = slideClasses[imgId][n];
+    var caption = document.getElementById(imgId + '_caption');
+    caption.innerHTML = slideCaptions[imgId][n];
   }
 </script>
+
   
 <body>
 
@@ -112,22 +178,94 @@
   <p>To build our mesh, we implemented the Ball Pivot Algorithm to iteratively find triangles. The general idea is to simulate a ball with radius r, which is wide enough that the ball can "sit" between 3 points in the cloud without falling through. We create a triangle using those 3 points and "rotate" the ball around one of that triangle's edges. If the ball is stopped in its rotation by another vertex, then edges are added to the mesh to create a triangle between the rotated edge and that point. This is repeated until we find no more triangles to add. To begin, we divide up the mesh into a 3D grid of voxels in order to more efficiently find neighboring vertices to a given point. We then determine a "seed triangle", or an arbitrary set of 3 vertices that satisfy the necessary conditions to allow the simulated ball to sit upon them. We create edges between those 3 vertices and add the resulting triangle to our mesh. These 3 edges are placed into a queue called the Front. In the Front, each edge stores its bounding vertices, the position of the ball when the edge was created, and whether the edge is a boundary (i.e. the rotated ball found nothing, and therefore there are no further triangles to make from this edge). We iteratively pop edges off of the Front and rotate the ball around them. If the ball finds a point, edges are created from our active edge to the new point, the new edges are added to the Front, and the new triangle is added to the mesh. The active edge is removed from the Front because it is no longer on the outside edge of our mesh and is therefore no longer useful for finding new triangles in a manifold object. We continue rotating the ball around all edges in the Front until the Front is empty. At this point, we search for a new seed triangle, in case there are disjoint pieces of the point cloud which must be processed. Once there are no more seed triangles to be found, the algorithm is complete.</p>
   <!-- END: c&p -->
 
+<h2 align="middle">Problems and Solutions</h2>
+  <p>The first major problem we encountered was in finding valid inputs to the algorithm. Ball pivoting requires that we have access to the normal vectors for every vertex in the point cloud, so that we can be sure that the normal of each face is consistent with the normals of its vertices and that our final mesh will be orientable and manifold. However, the point clouds and meshes given by the Stanford repository do not have any face or vertex normals, so we decided to just use the .dae files given to us for Project 2 and calculated the vertex normals using the Vertex::normal function written for that assignment and saving them to a new Vector3D norm added to the VertexIter class. Since we take in a complete HalfedgeMesh but only want a point cloud, we have to delete the mesh's edges, halfedges, faces and boundaries at the start of the ball pivot algorithm. A related issue arose at the end of the project, since the default Face::normal function expects that the vertices are entered and subsequently accessed in a particular order, which will probably change when we rebuild the mesh. To fix this, we added a check so that Face::normal returns the unit normal vector sum of the cross products if it points in the same direction as the average of the vertex normals, and otherwise returns the unit normal vector in the opposite direction.</p>
+
+  <p>We also experienced many bugs in our early code, mostly related to the voxel grid and rotating the ball. To find the voxel containing a given vertex, we used a hash function that finds the x, y, and z positions of the voxel and calculates the position of the voxel in the vector of voxels. We initially copied the hash function code we wrote for Project 4, but this caused the program to crash on certain radius inputs. We eventually realized that the problem was that we were hashing with respect to the point (0, 0, 0), which caused some negative numbers to hash to a negative index. To fix this, we added a minDimensions input to the hash function, which we subtract from the absolute position of the point to get its position relative to the most negative corner of the bounding box. </p>
+    
+    <p>The other major issue was finding the first center on the trajectory around a given point. It was easy to use dot products to find the smaller angle between the lines connecting the original center with the midpoint and the new center with the midpoint, which would give us the angle along the trajectory. However, we needed to account for the direction of the rotation, so that for rotations "below" the surface of the triangle the actual angle would be 2*PI minus the calculated angle. By drawing it out, we initially thought we could solve this by checking that the cross product of the original radius, from the midpoint to the first center, with the new radius, from the midpoint to the new center, was in the same direction as the cross product between the old radius and the line from the midpoint to the circumcenter of the circle around the three vertices of the face. If these cross products were in the same direction, we could say that we were at least PI along the trajectory. However, this only accounted for the case where the circumcenter was on the same side of the rotation edge as the opposite vertex, and in fact the opposite relationship holds if the circumcenter is on the opposite side of the rotation line from the opposite vertex. Finally, we needed to add a small delta so that we only recalculate the angle of rotation if that angle is above a certain value. Otherwise, we might think that extremely non-zero rotations foward are actually extremely small rotations backwards and thus large rotations along our trajectory.</p>
+
 
   <h2 align="middle">Results</h2>
 
+  <p><pre></pre>
+    Below are renders of the result of running BPA on several <pre>.DAE</pre> files given in Project 2. You can use the arrow buttons on the sides of the images to switch between views of the point cloud, BPA result, and given mesh.
+  </p>
 
-  <div class="w3-content w3-display-container" style="max-width:800px">
-    <img class="mySlides" src="images/cube_pc.png" style="width:100%">
-    <img class="mySlides" src="images/cube_bpa.png" style="width:100%">
-    <img class="mySlides" src="images/cube_real.png" style="width:100%">
-    <div class="w3-center w3-container w3-section w3-large w3-text-white w3-display-bottommiddle" style="width:100%">
-      <div class="w3-left w3-hover-text-khaki" onclick="plusDivs(-1)">&#10094;</div>
-      <div class="w3-right w3-hover-text-khaki" onclick="plusDivs(1)">&#10095;</div>
-      <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(1)"></span>
-      <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(2)"></span>
-      <span class="w3-badge demo w3-border w3-transparent w3-hover-white" onclick="currentDiv(3)"></span>
+  <br>
+
+  <h3 align="middle"><pre>cube.dae</pre></h3>
+  <div class="slideshow">
+    <img id="cube" style="width:100%">
+    <figcaption align="middle" id="cube_caption"></figcaption>
+    <div class="arrows" style="width:100%">
+      <div class="prev" onclick="incrementSlides(-1, 'cube')">&#10094;</div>
+      <div class="next" onclick="incrementSlides(1, 'cube')">&#10095;</div>
     </div>
   </div>
+
+  <br>
+
+  <h3 align="middle"><pre>quadball.dae</pre></h3>
+  <div class="slideshow">
+    <img id="quadball" style="width:100%">
+    <figcaption align="middle" id="quadball_caption"></figcaption>
+    <div class="arrows" style="width:100%">
+      <div class="prev" onclick="incrementSlides(-1, 'quadball')">&#10094;</div>
+      <div class="next" onclick="incrementSlides(1, 'quadball')">&#10095;</div>
+    </div>
+  </div>
+
+  <br>
+
+  <h3 align="middle"><pre>bean.dae</pre></h3>
+  <div class="slideshow">
+    <img id="bean" style="width:100%">
+    <figcaption align="middle" id="bean_caption"></figcaption>
+    <div class="arrows" style="width:100%">
+      <div class="prev" onclick="incrementSlides(-1, 'bean')">&#10094;</div>
+      <div class="next" onclick="incrementSlides(1, 'bean')">&#10095;</div>
+    </div>
+  </div>
+
+  <br>
+
+  <h3 align="middle"><pre>beetle.dae</pre></h3>
+  <div class="slideshow">
+    <img id="beetle" style="width:100%">
+    <figcaption align="middle" id="beetle_caption"></figcaption>
+    <div class="arrows" style="width:100%">
+      <div class="prev" onclick="incrementSlides(-1, 'beetle')">&#10094;</div>
+      <div class="next" onclick="incrementSlides(1, 'beetle')">&#10095;</div>
+    </div>
+  </div>
+
+  <br>
+
+  <h3 align="middle"><pre>maxplanck.dae</pre></h3>
+  <div class="slideshow">
+    <img id="maxplanck" style="width:100%">
+    <figcaption align="middle" id="maxplanck_caption"></figcaption>
+    <div class="arrows" style="width:100%">
+      <div class="prev" onclick="incrementSlides(-1, 'maxplanck')">&#10094;</div>
+      <div class="next" onclick="incrementSlides(1, 'maxplanck')">&#10095;</div>
+    </div>
+  </div>
+
+  <br>
+
+  <!-- TODO: add blurb about how different
+             spacing of points makes BPA not work -->
+  <h3 align="middle"><pre>teapot.dae</pre></h3>
+  <div class="slideshow">
+    <img id="teapot" style="width:100%">
+    <figcaption align="middle" id="teapot_caption"></figcaption>
+    <div class="arrows" style="width:100%">
+      <div class="prev" onclick="incrementSlides(-1, 'teapot')">&#10094;</div>
+      <div class="next" onclick="incrementSlides(1, 'teapot')">&#10095;</div>
+    </div>
+  </div>
+  <!-- END TODO -->
 
   <!-- UNCOMMENT AFTER VIDEO IS MADE
   <h2 align="middle">Video</h2>

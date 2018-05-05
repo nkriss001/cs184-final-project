@@ -17,6 +17,7 @@ namespace CGL {
   {
     Vector3D N( 0., 0., 0. );
     Vector3D actualN(0., 0., 0.);
+    bool useActual = false;
 
     HalfedgeCIter h = halfedge();
     do
@@ -25,13 +26,16 @@ namespace CGL {
       VertexCIter pj = h->next()->vertex();
       if (pi->norm[0] != INFINITY) {
         actualN += pi->norm;
+        //useActual = true;
       }
       N += cross( pi->position, pj->position );
 
       h = h->next();
     }
     while( h != halfedge() );
-    if (dot(N, actualN) >= 0) {
+    if (dot(N, actualN) >= 0 && !useActual) {
+      return N.unit();
+    } else if (dot(N, actualN) > 0) {
       return N.unit();
     } else {
       return -N.unit();

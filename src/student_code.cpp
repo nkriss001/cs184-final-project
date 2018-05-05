@@ -181,6 +181,7 @@ namespace CGL
     VertexIter v4 = h2->next()->next()->vertex();
     // new, center vertex
     VertexIter v5 = newVertex();
+    v5->norm = (v1->norm + v2->norm + v3->norm + v4->norm)/4.0;
 
     // faces
     FaceIter f1 = h1->face();
@@ -268,10 +269,11 @@ namespace CGL
     double r = BPAr; // The radius of the ball we will pivot
     double delta = pow(10, -6); // An error for calculating the angle
     vector<vertex_struct *> vertices; // A vector of vertices in the point cloud
-
     Vector3D maxDimensions(-INFINITY, -INFINITY, -INFINITY), minDimensions(INFINITY, INFINITY, INFINITY);
     for (VertexIter v = mesh.verticesBegin(); v != mesh.verticesEnd(); v++) {
-      v->norm = v->normal(); // Set vertex normals so we don't need faces to calculate them
+      if (v->norm[0] == INFINITY) {
+        v->norm = v->normal(); // Set vertex normals so we don't need faces to calculate them
+      }
       vertex_struct *v_struct = new vertex_struct(); // Instantiate a vertex struct for each vertex
       v_struct->v = v;
       vertices.push_back(v_struct);
@@ -301,8 +303,6 @@ namespace CGL
     // Initialize the front
     list<edge_struct *> front;
     // The main ball-pivot algorithm
-    int i = 0;
-    int j = 1000;
     while (true) {
       while (!front.empty()) {
         // Get the vertices of the first edge on the front and its opposite vertex
@@ -374,8 +374,6 @@ namespace CGL
         } 
 
         // Get the first center along the trajectory of the rotation
-        // For debugging purposes
-        int k = i;
         // All rotations will be in the range [0, 2*M_PI)
         double minTheta = 2.0 * M_PI;
         // The indices of the first center on the trajectory and its corresponding vk
@@ -422,19 +420,16 @@ namespace CGL
             }            
           }
         }
-        /*i += 1;
-        if (i >= j) {
-          return;
-        }*/
       }
 
       bool found_seed = find_seed_triangle(mesh, voxels, vertices, front, dimensions, minDimensions, r);
-      i += 1;
-      /*if (i >= j) {
-        return;
-      }*/
       if (!found_seed) {
         break;
+      }
+    }
+    for (vertex_struct *v_struct : vertices) {
+      if (!v_struct->used) {
+        mesh.deleteVertex(v_struct->v);
       }
     }
     return;
@@ -457,7 +452,7 @@ namespace CGL
         for (int k = 0; k < vox.size(); k++) { // We look at every vertex in the voxel
           vertex_struct* vk_struct = vox[k];
           VertexIter vk = vk_struct->v; // A point that is not yet part of the mesh
-          vk_struct->used = true;
+          //vk_struct->used = true;
           vector<vertex_struct *> possibleVertices; // Vertices within 2r of our seed vertex vk
           for (int x = -1; x < 2; x++) { // We look at the surrounding voxels for potential seed points
             for (int y = -1; y < 2; y++) {
@@ -507,6 +502,7 @@ namespace CGL
                   // If the sphere touches vi, vj and vk and contains no other data point, (vi, vj, vk) is a valid seed triangle
                   if (c_bool) {
                     // Set all vertices to used
+                    vk_struct->used = true;
                     vi_struct->used = true;
                     vj_struct->used = true;
 
@@ -824,7 +820,6 @@ namespace CGL
 
       e->newPosition = (3.0/8.0) * (A+B) + (1.0/8.0) * (C+D);
     }
-
 
     // TODO Next, we're going to split every edge in the mesh, in any order.  For future
     // TODO reference, we're also going to store some information about which subdivided
